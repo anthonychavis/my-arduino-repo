@@ -13,7 +13,7 @@ uint16_t delayMS = 400;
 
 //// for servo
 Servo myServo;
-const uint8_t servoPin = 10;  // A7 == D1
+const uint8_t servoPin = 10;  // A3 == D10
 uint8_t minAngle = 1;
 uint8_t maxAngle = 174;  // reduced b/c the servo clicks & makes other weird noises
 uint8_t item = 0;
@@ -21,11 +21,11 @@ uint8_t item = 0;
 
 //// for mag connector
 bool discontinuous;
-const uint8_t contPin = 1;
+const uint8_t contPin = 1;  // A7 == D1
 
 //// for onboard LED
 const uint8_t ledBtnPin = 4;
-const uint8_t onboardLedPin = 13;  // A3 == D10
+const uint8_t onboardLedPin = 13;
 
 //// put your setup code here, to run once:
 void setup() {
