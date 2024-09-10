@@ -44,11 +44,11 @@ void loop() {
     discontinuous = digitalRead(contPin);  // HIGH & True == 1; (so probably) LOW & False == 0 --> so should be int, not bool? ????
     if(CircuitPlayground.slideSwitch()) {
         if(curMillis - timer > delayMS){
-        if(!discontinuous) {
-            contFunc(item);
-        } else {
-            discontFunc(item);
-        }
+            if(!discontinuous) {
+                contFunc(item);
+            } else {
+                discontFunc(item);
+            }
         }
     }
     // (quick functioning test) turn on D13 LED when D4 btn is pressed; will 1st read the status of the LED then 
