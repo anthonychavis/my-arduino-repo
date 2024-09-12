@@ -47,14 +47,10 @@ void loop() {
     if(CircuitPlayground.slideSwitch()) {
         if(curMillis - timer > delayMS){
             // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired; twitch state not yet set in this draft
-            if(!discontinuous) {
-                contFunc(item);
-            } else {
-                discontFunc(item);
-            }
+            !discontinuous ? contFunc(item) : discontFunc(item);
         }
     }
-    // (quick functioning test) turn on D13 LED when D4 btn is pressed; will 1st read the status of the LED then 
+    // (quick functioning test) turn on D13 LED when D4 btn is pressed; will 1st read the status of the LED 
     digitalWrite(onboardLedPin, digitalRead(ledBtnPin));
 }
 
