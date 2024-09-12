@@ -53,7 +53,7 @@ void loop() {
         }
     }
     // (quick functioning test) turn on D13 LED when D4 btn is pressed; will 1st read the status of the LED then 
-    digitalWrite(13, digitalRead(4));
+    digitalWrite(onboardLedPin, digitalRead(ledBtnPin));
 }
 
 //// functions
