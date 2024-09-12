@@ -14,8 +14,10 @@ uint16_t delayMS = 400;
 //// for servo
 Servo myServo;
 const uint8_t servoPin = 10;  // A3 == D10
-uint8_t minAngle = 1;
-uint8_t maxAngle = 174;  // reduced b/c the servo clicks & makes other weird noises
+const uint8_t minAngle = 1;
+const uint8_t maxAngle = 174;  // reduced b/c the servo clicks & makes other weird noises
+const uint8_t angleRange = maxAngle - minAngle;
+const uint8_t middleAngle = angleRange / 2;
 uint8_t item = 0;
 // uint8_t twitch = 4;
 
@@ -66,13 +68,13 @@ void contFunc(uint8_t itemState) {
             contCaseBlock(minAngle, 1);
             break;
         case 1:
-            contCaseBlock(90, 2);
+            contCaseBlock(middleAngle, 2);
             break;
         case 2:
             contCaseBlock(maxAngle, 3);
             break;
         default:
-            contCaseBlock(90, 0);
+            contCaseBlock(middleAngle, 0);
             break;
     }
 }
@@ -98,5 +100,6 @@ void contCaseBlock(uint8_t angle, uint8_t newItemVal) {
     timer = curMillis;
     item = newItemVal;
 }
+
 // look into using random(min, max);
   // https://www.arduino.cc/reference/en/language/functions/random-numbers/random/
