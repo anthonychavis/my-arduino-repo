@@ -34,7 +34,7 @@ void setup() {
     CircuitPlayground.begin();
     myServo.attach(servoPin);
     pinMode(onboardLedPin, OUTPUT);  // just for onboard red LED
-    pinMode(ledBtnPin, INPUT_PULLDOWN);  // makes default status of the D4 btn = 0 (as opposed to 1)
+    pinMode(ledBtnPin, INPUT_PULLDOWN);  // makes default status of the D4 btn = 0 (as opposed to truthy)
     pinMode(contPin, INPUT_PULLUP);
 }
 
