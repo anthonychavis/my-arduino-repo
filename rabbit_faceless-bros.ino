@@ -92,6 +92,7 @@ void discontFunc(uint8_t itemState) {
     }
 }
 
+// used w/in contFunc & discontFunc
 void contCaseBlock(uint8_t angle, uint8_t newItemVal) {
     myServo.write(angle);
     timer = curMillis;
