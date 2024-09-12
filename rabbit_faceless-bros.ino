@@ -1,7 +1,7 @@
 ////// currently built for use w/Circuit Playground Express
-    // still needs:
+    // planning to add:
         // post-death duration
-        // and other changes for bigger movements
+        // and other changes for bigger movements (if servo capable)
         // look into random(); see bottom of file
 
 #include <Servo.h> // look more into this ??
@@ -44,6 +44,7 @@ void loop() {
     discontinuous = digitalRead(contPin);  // HIGH & True == 1; (so probably) LOW & False == 0 --> so should be int, not bool? ????
     if(CircuitPlayground.slideSwitch()) {
         if(curMillis - timer > delayMS){
+            // if accidental (continuity) disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired; twitch state not yet set in this draft
             if(!discontinuous) {
                 contFunc(item);
             } else {
@@ -56,28 +57,11 @@ void loop() {
 }
 
 //// functions
+    // if accidental [continuity] disconnect then reconnect, it will still function as long as death twitch state not complete/expired; twitch state not yet set in this draft
+    
 // used while continuity through mag connector (or other method of continuity)
 void contFunc(int itemState) {
-    switch (itemState) {
-        case 0:
-            myServo.write(minAngle);
-            timer = curMillis;
-            item = 1;
-            break;
-        case 1:
-            myServo.write(maxAngle);
-            timer = curMillis;
-            item = 0;
-            break;
-        default:
-            item = 0;
-            break;
-    }
-}
-
-// used while NO continuity through mag connector (or other method of continuity)
-void discontFunc(int itemState) {
-    switch (itemState) {
+     switch (itemState) {
         case 0:
             myServo.write(minAngle);
             timer = curMillis;
@@ -97,6 +81,25 @@ void discontFunc(int itemState) {
         default:
             myServo.write(90);
             timer = curMillis;
+            item = 0;
+            break;
+    }
+}
+
+// used while NO continuity through mag connector (or other method of continuity)
+void discontFunc(int itemState) {
+    switch (itemState) {
+        case 0:
+            myServo.write(minAngle);
+            timer = curMillis;
+            item = 1;
+            break;
+        case 1:
+            myServo.write(maxAngle);
+            timer = curMillis;
+            item = 0;
+            break;
+        default:
             item = 0;
             break;
     }
