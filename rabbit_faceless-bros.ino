@@ -60,7 +60,7 @@ void loop() {
     // if accidental [continuity] disconnect then reconnect, it will still function as long as death twitch state not complete/expired; twitch state not yet set in this draft
     
 // used while continuity through mag connector (or other method of continuity)
-void contFunc(int itemState) {
+void contFunc(uint8_t itemState) {
      switch (itemState) {
         case 0:
             myServo.write(minAngle);
@@ -87,7 +87,7 @@ void contFunc(int itemState) {
 }
 
 // used while NO continuity through mag connector (or other method of continuity)
-void discontFunc(int itemState) {
+void discontFunc(uint8_t itemState) {
     switch (itemState) {
         case 0:
             myServo.write(minAngle);
