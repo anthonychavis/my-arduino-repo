@@ -63,25 +63,16 @@ void loop() {
 void contFunc(uint8_t itemState) {
      switch (itemState) {
         case 0:
-            myServo.write(minAngle);
-            timer = curMillis;
-            item = 1;
+            contCaseBlock(minAngle, 1);
             break;
         case 1:
-            myServo.write(90);
-            timer = curMillis;
-            item = 2;
+            contCaseBlock(90, 2);
             break;
         case 2:
-            myServo.write(maxAngle);
-            timer = curMillis;
-            item = 3;
+            contCaseBlock(maxAngle, 3);
             break;
-        // case 3:
         default:
-            myServo.write(90);
-            timer = curMillis;
-            item = 0;
+            contCaseBlock(90, 0);
             break;
     }
 }
@@ -90,14 +81,10 @@ void contFunc(uint8_t itemState) {
 void discontFunc(uint8_t itemState) {
     switch (itemState) {
         case 0:
-            myServo.write(minAngle);
-            timer = curMillis;
-            item = 1;
+            contCaseBlock(minAngle, 1);
             break;
         case 1:
-            myServo.write(maxAngle);
-            timer = curMillis;
-            item = 0;
+            contCaseBlock(maxAngle, 0);
             break;
         default:
             item = 0;
@@ -105,5 +92,10 @@ void discontFunc(uint8_t itemState) {
     }
 }
 
+void contCaseBlock(uint8_t angle, uint8_t newItemVal) {
+    myServo.write(angle);
+    timer = curMillis;
+    item = newItemVal;
+}
 // look into using random(min, max);
   // https://www.arduino.cc/reference/en/language/functions/random-numbers/random/
