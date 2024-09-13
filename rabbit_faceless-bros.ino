@@ -7,7 +7,7 @@
 #include <Servo.h> // look more into this ??
 #include <Adafruit_Circuit_Playground.h>
 
-int timer = 0;
+unsigned long timer = 0;
 unsigned long curMillis;
 uint16_t delayMS = 500;
 
