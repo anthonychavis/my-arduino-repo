@@ -20,7 +20,7 @@ const uint8_t angleRange = maxAngle - minAngle;
 const uint8_t middleAngle = angleRange / 2;
 uint8_t item = 0;
 const uint8_t initTwitchVal = 4;
-uint8_t twitch;
+uint8_t twitch = initTwitchVal;
 
 //// for mag connector
 bool discontinuous;
