@@ -19,7 +19,7 @@ const uint8_t maxAngle = 174;  // reduced b/c the servo clicks & makes other wei
 const uint8_t angleRange = maxAngle - minAngle;
 const uint8_t middleAngle = angleRange / 2;
 uint8_t item = 0;
-const uint8_t initTwitchVal = 4;
+const uint8_t initTwitchVal = 8;
 uint8_t twitch = initTwitchVal;
 
 //// for mag connector
@@ -48,12 +48,12 @@ void loop() {
     if(!CircuitPlayground.slideSwitch()) return;
     curMillis = millis();
     discontinuous = digitalRead(contPin);  // HIGH & True == 1; (so probably) LOW & False == 0 --> so should be int, not bool? ????
-    // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired; twitch state not yet set in this draft
+    // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired
     if(curMillis - timer > delayMS) !discontinuous ? contFunc(item) : discontFunc(item);
 }
 
 //// functions
-    // if accidental [continuity] disconnect then reconnect, it will still function as long as death twitch state not complete/expired; twitch state not yet set in this draft
+    // if accidental [continuity] disconnect then reconnect, it will still function as long as death twitch state not complete/expired
     
 // used while continuity through mag connector (or other method of continuity)
 void contFunc(uint8_t itemState) {
