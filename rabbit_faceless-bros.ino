@@ -19,7 +19,8 @@ const uint8_t maxAngle = 174;  // reduced b/c the servo clicks & makes other wei
 const uint8_t angleRange = maxAngle - minAngle;
 const uint8_t middleAngle = angleRange / 2;
 uint8_t item = 0;
-// uint8_t twitch = 4;
+const uint8_t initTwitchVal = 4;
+uint8_t twitch;
 
 //// for mag connector
 bool discontinuous;
@@ -56,7 +57,8 @@ void loop() {
     
 // used while continuity through mag connector (or other method of continuity)
 void contFunc(uint8_t itemState) {
-     switch (itemState) {
+    twitch = initTwitchVal;
+    switch (itemState) {
         case 0:
             contCaseBlock(minAngle, 1);
             break;
@@ -74,6 +76,7 @@ void contFunc(uint8_t itemState) {
 
 // used while NO continuity through mag connector (or other method of continuity)
 void discontFunc(uint8_t itemState) {
+    twitch -= 1;
     switch (itemState) {
         case 0:
             contCaseBlock(minAngle, 1);
