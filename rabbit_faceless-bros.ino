@@ -9,13 +9,13 @@
 
 int timer = 0;
 unsigned long curMillis;
-uint16_t delayMS = 400;
+uint16_t delayMS = 500;
 
 //// for servo
 Servo myServo;
 const uint8_t servoPin = 10;  // A3 == D10
 const uint8_t minAngle = 1;
-const uint8_t maxAngle = 174;  // reduced b/c the servo clicks & makes other weird noises
+const uint8_t maxAngle = 170;  // reduced b/c the servo clicks & makes other weird noises
 const uint8_t angleRange = maxAngle - minAngle;
 const uint8_t middleAngle = angleRange / 2;
 uint8_t item = 0;
@@ -76,7 +76,7 @@ void contFunc(uint8_t itemState) {
 
 // used while NO continuity through mag connector (or other method of continuity)
 void discontFunc(uint8_t itemState) {
-    twitch -= 1;
+    twitch--;
     switch (itemState) {
         case 0:
             contCaseBlock(minAngle, 1);
