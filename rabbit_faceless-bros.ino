@@ -49,7 +49,7 @@ void loop() {
     curMillis = millis();
     discontinuous = digitalRead(contPin);  // HIGH & True == 1; (so probably) LOW & False == 0 --> so should be int, not bool? ????
     // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired
-    if(curMillis - timer > delayMS) !discontinuous ? contFunc(item) : discontFunc(item);
+    if(twitch && curMillis - timer > delayMS) !discontinuous ? contFunc(item) : discontFunc(item);
 }
 
 //// functions
