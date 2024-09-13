@@ -32,7 +32,7 @@ const uint8_t onboardLedPin = 13;
 //// put your setup code here, to run once:
 void setup() {
     // Serial.begin(9600);
-    delay(1000);
+    // delay(1000);
     CircuitPlayground.begin();
     myServo.attach(servoPin);
     pinMode(onboardLedPin, OUTPUT);  // just for onboard red LED
@@ -44,11 +44,10 @@ void setup() {
 void loop() {
     curMillis = millis();
     discontinuous = digitalRead(contPin);  // HIGH & True == 1; (so probably) LOW & False == 0 --> so should be int, not bool? ????
-    if(CircuitPlayground.slideSwitch()) {
-        if(curMillis - timer > delayMS){
-            // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired; twitch state not yet set in this draft
-            !discontinuous ? contFunc(item) : discontFunc(item);
-        }
+    if(CircuitPlayground.slideSwitch()) return;
+    if(curMillis - timer > delayMS){
+        // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired; twitch state not yet set in this draft
+        !discontinuous ? contFunc(item) : discontFunc(item);
     }
     // (quick functioning test) turn on D13 LED when D4 btn is pressed; will 1st read the status of the LED 
     digitalWrite(onboardLedPin, digitalRead(ledBtnPin));
