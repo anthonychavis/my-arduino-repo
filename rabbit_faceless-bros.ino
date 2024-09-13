@@ -57,7 +57,7 @@ void loop() {
     
 // used while continuity through mag connector (or other method of continuity)
 void contFunc(uint8_t itemState) {
-    twitch = initTwitchVal;
+    if(twitch != initTwitchVal) twitch = initTwitchVal;
     switch (itemState) {
         case 0:
             contCaseBlock(minAngle, 1);
