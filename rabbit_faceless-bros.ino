@@ -42,13 +42,13 @@ void setup() {
 
 //// put your main code here, to run repeatedly:
 void loop() {
-    curMillis = millis();
-    discontinuous = digitalRead(contPin);  // HIGH & True == 1; (so probably) LOW & False == 0 --> so should be int, not bool? ????
-    if(!CircuitPlayground.slideSwitch()) return;
-    // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired; twitch state not yet set in this draft
-    if(curMillis - timer > delayMS) !discontinuous ? contFunc(item) : discontFunc(item);
     // (quick functioning test) turn on D13 LED when D4 btn is pressed; will 1st read the status of the LED 
     digitalWrite(onboardLedPin, digitalRead(ledBtnPin));
+    if(!CircuitPlayground.slideSwitch()) return;
+    curMillis = millis();
+    discontinuous = digitalRead(contPin);  // HIGH & True == 1; (so probably) LOW & False == 0 --> so should be int, not bool? ????
+    // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired; twitch state not yet set in this draft
+    if(curMillis - timer > delayMS) !discontinuous ? contFunc(item) : discontFunc(item);
 }
 
 //// functions
