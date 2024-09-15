@@ -4,6 +4,7 @@
         // look into random(); see bottom of file
 
 #include <Adafruit_Circuit_Playground.h>
+#include "Rabbit_Res.hpp"
 
 //// put your setup code here, to run once:
 void setup() {
