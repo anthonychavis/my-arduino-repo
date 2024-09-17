@@ -1,31 +1,38 @@
 ////// currently built for use w/Circuit Playground Express
-    // planning to add:
-        // and other changes for bigger movements (if servo capable)
-        // look into random(); see bottom of file
 
 #include <Adafruit_Circuit_Playground.h>
 #include "Rabbit_Res.hpp"
 
 //// put your setup code here, to run once:
 void setup() {
-    // Serial.begin(9600);
-    // delay(1000);
+
+    Serial.begin(9600);
+    delay(1000);
+    // randomSeed(analogRead(0));  // works as expected w/o this
+    
     CircuitPlayground.begin();
     myServo.attach(servoPin);
     pinMode(onboardLedPin, OUTPUT);  // just for onboard red LED
     pinMode(ledBtnPin, INPUT_PULLDOWN);  // makes default status of the D4 btn = 0 (as opposed to truthy)
     pinMode(contPin, INPUT_PULLUP);
+
+    // instantiate pinMode for twitch reset
+    // pinMode(twitchRstBtnPin, INPUT_PULLDOWN);
 }
 
 //// put your main code here, to run repeatedly:
 void loop() {
-    // (quick functioning test) turn on D13 LED when D4 btn is pressed; will 1st read the status of the LED 
-    digitalWrite(onboardLedPin, digitalRead(ledBtnPin));
-    if(!CircuitPlayground.slideSwitch()) return;
-    curMillis = millis();
-    discontinuous = digitalRead(contPin);  // HIGH & True == 1; (so probably) LOW & False == 0 --> so should be int, not bool? ????
-    if(twitch && curMillis - timer > delayMS) !discontinuous ? contFunc(item) : discontFunc(item);  // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired
-}
+    digitalWrite(onboardLedPin, digitalRead(ledBtnPin));  // (quick functioning test) turn on D13 LED when D4 btn is pressed; will 1st read the status of the LED 
 
-// look into using random(min, max);
-  // https://www.arduino.cc/reference/en/language/functions/random-numbers/random/
+    // use digitalWrite to reset twitch ?? --> twitch = initTwitchVal; (prolly not)
+    // digitalWrite(twitch = initTwitchVal, digitalRead(twitchRstBtnPin));
+
+    if(!CircuitPlayground.slideSwitch()) return;
+
+
+
+    curMillis = millis();
+    discontinuous = digitalRead(contPin);  // HIGH & True == 1 b/c stored as a bit (1 or 0)
+    // if(twitch && curMillis - timer > delayMS) !discontinuous ? contFunc(item) : discontFunc(item);  // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired
+    if(twitch && curMillis - timer > delayMS) !discontinuous ? contFunc() : discontFunc();  // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired
+}
