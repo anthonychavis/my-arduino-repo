@@ -1,13 +1,12 @@
 /*
 implement:
 - go from const pins to #define pins
+- end neutral
 */
 
 
 /*
 TEST SPEED W/CHRONO ON w/inline vs w/o inline
-    - look into using arduino ide to print the time
-    - https://www.arduino.cc/reference/en/language/functions/communication/print/
 */
 
 /*
@@ -24,151 +23,75 @@ random(min, max);
     - https://www.arduino.cc/reference/en/language/functions/random-numbers/randomseed/
 */
 
-#include <Servo.h> // look more into this ??
+#include <Servo.h> // look more into this ?? #define MAX_SERVOS 0??
 
 // VARS
 
 // time
 unsigned long curMillis, timer = 0;
+// unsigned long counter = 0;
 uint16_t delayMS = 500;
 
 // for servo
 Servo myServo;
 const uint8_t servoPin = 10;  // A3 == D10
-const uint8_t minAngle = 1;
-const uint8_t maxAngle = 170;  // reduced b/c the servo clicks & makes other weird noises
-// const uint8_t angleRange = maxAngle - minAngle;
-// const uint8_t middleAngle = angleRange / 2;
+const uint8_t minAng = 5;  // if 0, change initial prevAng
+const uint8_t maxAng = 165;  // reduced b/c the servo clicks & makes other weird noises
+const uint8_t angRange = maxAng - minAng + 1;  // inclusive
+const uint8_t middleAng = angRange / 2;  // truncated
 
 const uint8_t initTwitchVal = 30;
-uint8_t twitch = initTwitchVal, prevAngle = 0, angleDiff, newAngle;  // used for randomness & speed along w/delayMS
-
-// const double maxVelocity = 60 / 250;  // degrees/millisecs for servo; check if smaller version of double (like uint8_t) !!
-const double velocity = 5 / 250;  // degrees/millisecs
-
+uint8_t twitch = initTwitchVal, absAngDiff, prevAng = 0, newAng;
+int16_t angDiff;
+const double vel = 60.0 / 250;  // degrees/millisecs
 
 // for mag connector
 bool discontinuous;
-const uint8_t contPin = 1;  // A7 == D1
-
+const uint8_t contPin = 1;  // A7 == D1 - CPE
 
 // for onboard
-const uint8_t ledBtnPin = 4;
-const uint8_t onboardLedPin = 13;
-// const uint8_t twitchRstBtnPin = ;
-
+const uint8_t ledBtnPin = 4;  // btn A - CPE
+const uint8_t onboardLedPin = 13;  // - CPE
+// const uint8_t bBtnPin = 5; // btn B - CPE
 
 //// FUNCTIONS
+
+// 
+inline
+void potato() {
+    newAng = random(minAng, maxAng);
+    // newAng = counter % 2 ? minAng : maxAng;  // used for quick test
+    angDiff = newAng - prevAng;
+    absAngDiff = angDiff >= 0 ? angDiff : abs(angDiff);  // don't calc w/in abs()
+    delayMS = absAngDiff / vel + 1;
+    myServo.write(newAng);
+    prevAng = newAng;
+    timer = curMillis;
+}
+
+// used at beginning of program & for testing
+inline
+void setupContFunc() {
+    prevAng = minAng;
+    myServo.write(prevAng);
+    delay(100);
+}
     
 // used while continuity through mag connector (or other method of continuity)
-// inline
-// void contFunc(uint8_t itemState) {
 inline
 void contFunc() {
     if(twitch != initTwitchVal) twitch = initTwitchVal;
-
-    if (!prevAngle) {
-        prevAngle = minAngle;
-        myServo.write(prevAngle);
-        delay(100);
-    }
-    Serial.prinln(prevAngle);
-    delay(50);
-    newAngle = random(minAngle, maxAngle);
-    Serial.println(newAngle);
-    delay(50);
-    angleDiff = newAngle - prevAngle;
-    angleDiff = abs(angleDiff);  // DOES NOT WORK AS EXPECTED;
-    Serial.printIn(angleDiff);
-    delay(50);
-
-    // delayMS = 500;
-    // delayMS = angleDiff / maxVelocity;
-    // delayMS = angleDiff / velocity;
-    // delayMS += angleDiff / velocity;
-    // delayMS = angleDiff / velocity + 500;
-    Serial.println(delayMS);
-    delay(50);
-
-    myServo.write(newAngle);
-    prevAngle = newAngle;
+    if (!prevAng) setupContFunc();  
+    potato();
 }
 
 // used while NO continuity through mag connector (or other method of continuity)
-// inline
-// void discontFunc(uint8_t itemState) {
 inline
 void discontFunc() {
-    if (!prevAngle) {
-        prevAngle = minAngle;
-        myServo.write(prevAngle);
-        delay(100);
-    }
-    Serial.println(prevAngle);
-    delay(50);
-    newAngle = random(minAngle, maxAngle);
-    Serial.println(newAngle);
-    delay(50);
-    angleDiff = newAngle - prevAngle;
-    angleDiff = abs(angleDiff);  // DOESNT WORK AS EXPECTED; do not calc w/in this method - see Arduino docs
-    Serial.printIn(angleDiff);
-    delay(50);
+    // if (!prevAng) setupContFunc();  // used here while testing
+        // Serial.println(twitch);
+    potato();
 
-    // delayMS = 500;
-    // delayMS = angleDiff / maxVelocity;
-    // delayMS = angleDiff / velocity;
-    // delayMS += angleDiff / velocity;
-    // delayMS = angleDiff / velocity + 500;
-    Serial.println(delayMS);
-    delay(50);
-
-    myServo.write(newAngle);
-    prevAngle = newAngle;
     twitch--;
+    // counter++;
 }
-
-
-
-
-// uint8_t item = 0;
-
-
-    // switch (itemState) {
-    //     case 0:
-    //         contCaseBlock(minAngle, 1);
-    //         break;
-    //     case 1:
-    //         contCaseBlock(middleAngle, 2);
-    //         break;
-    //     case 2:
-    //         contCaseBlock(maxAngle, 3);
-    //         break;
-    //     default:
-    //         contCaseBlock(middleAngle, 0);
-    //         break;
-    // }
-
-
-
-    // Serial.println(newAngle);
-
-    // switch (itemState) {
-    //     case 0:
-    //         contCaseBlock(minAngle, 1);
-    //         break;
-    //     case 1:
-    //         contCaseBlock(maxAngle, 0);
-    //         break;
-    //     default:
-    //         item = 0;
-    //         break;
-    // }
-
-
-    // used w/in contFunc & discontFunc
-// inline
-// void contCaseBlock(uint8_t angle, uint8_t newItemVal) {
-//     myServo.write(angle);
-//     timer = curMillis;
-//     item = newItemVal;
-// }
