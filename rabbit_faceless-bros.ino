@@ -7,24 +7,27 @@ void setup() {
     Serial.begin(9600);
     delay(1000);
 
-    // servo
-    myServo.attach(servoPin);
-    myServo.write(middleAng);
-
-    // continuity
-    pinMode(contPin, INPUT_PULLUP);
-
     // board
     CircuitPlayground.begin();  // - CPE
     pinMode(onboardLedPin, OUTPUT);  // just for onboard red LED
     pinMode(ledBtnPin, INPUT_PULLDOWN);  // makes default status of the D4 btn = 0 (as opposed to truthy)
+
+    // continuity
+    pinMode(contPin, INPUT_PULLUP);
+
+    // servo
+    myServo.attach(servoPin);
+    myServo.write(middleAng);
 }
 
 //// put your main code here, to run repeatedly:
 void loop() {
     digitalWrite(onboardLedPin, digitalRead(ledBtnPin));  // (quick functioning test) turn on D13 LED when D4 btn is pressed; will 1st read the status of the LED 
 
-    if(!CircuitPlayground.slideSwitch()) return;  // - CPE
+    if(!CircuitPlayground.slideSwitch()) {  // - CPE
+        delay(1000);
+        return;
+    }
 
     curMillis = millis();
     discontinuous = digitalRead(contPin);  // HIGH & True == 1
