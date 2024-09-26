@@ -25,14 +25,14 @@ random(min, max);
     - https://www.arduino.cc/reference/en/language/functions/random-numbers/randomseed/
 */
 
-#include <Servo.h> // look more into this ?? #define MAX_SERVOS 0??
+#include <Servo.h> // look more into this ?? #define MAX_SERVOS 0 ??
 
 // VARS
 
 // time
 unsigned long curMillis, timer = 0;
-uint8_t counter = 0;
-uint16_t delayMS = 500;
+bool decapped = false;
+uint16_t delayMS;
 
 // for servo
 Servo myServo;
@@ -42,14 +42,16 @@ const uint8_t minAng = 10;  // if 0, change initial prevAng
 const uint8_t maxAng = 170;  // reduced b/c the servo clicks & makes other weird noises
 const uint8_t angRange = maxAng - minAng + 1;  // inclusive
 const uint8_t middleAng = angRange / 2;  // truncated
-const uint8_t initTwitchVal = 15;  // can calc this rather than hard code !!
+const uint8_t initTwitchVal = 10;  // can calc this rather than hard code !!
 uint8_t twitch = initTwitchVal, absAngDiff, prevAng = 0, newAng;
 int16_t angDiff;
-const double vel = 60.0 / 210;  // degrees/millisecs
+const double vel = 60.0 / 250;  // degrees/millisecs
+const float initAccel = 1.1;
+float accel = initAccel;
 
 // for mag connector
 bool discontinuous;
-#define contPin 1  // A7 == D1 - CPE
+#define contPin 1  // A7 == D1 - CPE; (digital input)
 
 // for onboard
 #define ledBtnPin 4  // btn A - CPE
@@ -81,36 +83,46 @@ void setupContFunc() {
 // used while continuity through mag connector (or other method of continuity)
 inline
 void contFunc() {
-    if(twitch != initTwitchVal) {
+    if(twitch != initTwitchVal) {  // fix twitch
         twitch = initTwitchVal;
-        counter = 0;
+        decapped = false;
+        accel = initAccel;
+        prevAng = newAng;
     }
-    if (!prevAng) setupContFunc();  
+    if (!prevAng) setupContFunc();
     potato();
 }
 
 // used while NO continuity through mag connector (or other method of continuity); return to middle angle
 inline
 void discontFunc() {
-    if(!counter) {  // what if greater than 3/4 ??
+    // rev depending on motor orientation w/model
+    if(!decapped) {  // could add code for if position greater than 3/4 at start of this block !!
+        delay(50);
+            // Serial.print("prevAng @decap: ");
+            // Serial.println(prevAng);
         newAng = middleAng * 7 / 4;  // change to 1/4 if oriented in other direction; imagery = should curl up before loosening
-        // Serial.print("newAng when counter < 1: ");
-        // Serial.println(newAng);
+            // Serial.print("newAng when decapped < 1: ");
+            // Serial.println(newAng);
         angDiff = newAng - prevAng;
         absAngDiff = angDiff >= 0 ? angDiff : abs(angDiff);  // don't calc w/in abs()
-        delayMS = absAngDiff / vel + 1;
-        counter++;
+        delayMS = absAngDiff / vel + 251;
+        decapped = true;
     } else {
-        if(middleAng < newAng) {
-            newAng -= 8;
-            if(newAng < middleAng) newAng = middleAng;
+        if(middleAng < newAng && accel < middleAng) {
+            // if(accel < middleAng) {
+            newAng -= accel;
+            accel *= accel;
+        } else {
+            newAng = middleAng;
+        }
+        // }
+        delayMS = 65;
             // Serial.print("newAng during drop: ");
             // Serial.println(newAng);
-            delayMS = (newAng - middleAng) / vel;
-        }
+            // Serial.println(accel);
     }
-
     myServo.write(newAng);
     timer = curMillis;
-    twitch--;
+    twitch--;  // fix this !!
 }
