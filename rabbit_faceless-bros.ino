@@ -11,7 +11,7 @@ void setup() {
     Serial.begin(9600);
     delay(1000);
 
-    // board
+    // for quick board functioning test
     pinMode(onboardLedPin, OUTPUT);  // just for onboard red LED
     pinMode(ledBtnPin, INPUT_PULLDOWN);  // makes default status of the D4 btn = 0 (as opposed to truthy)
 
@@ -23,22 +23,32 @@ void setup() {
 
     // servo
     myServo.attach(servoPin);
-    myServo.write(middleAng);
-    prevAng = middleAng;
+    if(myServo.attached()) {
+        myServo.write(middleAng);
+        prevAng = middleAng;
+    }
 }
 
 //// put your main code here, to run repeatedly:
 void loop() {
-    digitalWrite(onboardLedPin, digitalRead(ledBtnPin));  // (quick functioning test) turn on D13 LED when D4 btn is pressed; will 1st read the status of the LED 
+    // (quick functioning test)
+    digitalWrite(onboardLedPin, digitalRead(ledBtnPin));
 
-    // board controlled switch (not between power & board)
+    // for board controlled switch (not between power & board)
     switchOn = digitalRead(switchPin);
     if(!switchOn) {
         delay(500);
         return;
     }
 
-    curMillis = millis();
-    discontinuous = digitalRead(contPin);  // HIGH & True == 1
-    if(twitch && curMillis - timer > delayMS) !discontinuous ? contFunc() : discontFunc();  // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired
+    if(myServo.attached()) {
+        curMillis = millis();
+        discontinuous = digitalRead(contPin);  // HIGH & True == 1
+        if(twitch && curMillis - timer > delayMS) !discontinuous ? contFunc() : discontFunc();  // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired
+    } else {
+        delay(500);
+        return;
+    }
+
+    if(!twitch) myServo.detach();  // remove accidental movement of servo
 }
