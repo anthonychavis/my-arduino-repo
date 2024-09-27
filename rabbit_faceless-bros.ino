@@ -1,4 +1,8 @@
-#include <Adafruit_Circuit_Playground.h>  // remove this !!
+/*
+NOTE:
+    - CPx = Circuit Playground Express
+*/
+
 #include "Rabbit_Res.hpp"
 
 //// put your setup code here, to run once:
@@ -8,24 +12,29 @@ void setup() {
     delay(1000);
 
     // board
-    CircuitPlayground.begin();  // - CPE
     pinMode(onboardLedPin, OUTPUT);  // just for onboard red LED
     pinMode(ledBtnPin, INPUT_PULLDOWN);  // makes default status of the D4 btn = 0 (as opposed to truthy)
 
+    // board controlled switch (not between power & board)
+    pinMode(switchPin, INPUT_PULLUP);  // resistor needed for CPx onboard switch; 
+
     // continuity
-    pinMode(contPin, INPUT_PULLUP);
+    pinMode(contPin, INPUT_PULLUP);  // uses onboard resistor; 
 
     // servo
     myServo.attach(servoPin);
     myServo.write(middleAng);
+    prevAng = middleAng;
 }
 
 //// put your main code here, to run repeatedly:
 void loop() {
     digitalWrite(onboardLedPin, digitalRead(ledBtnPin));  // (quick functioning test) turn on D13 LED when D4 btn is pressed; will 1st read the status of the LED 
 
-    if(!CircuitPlayground.slideSwitch()) {  // - CPE
-        delay(1000);
+    // board controlled switch (not between power & board)
+    switchOn = digitalRead(switchPin);
+    if(!switchOn) {
+        delay(500);
         return;
     }
 
