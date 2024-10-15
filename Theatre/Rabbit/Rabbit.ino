@@ -28,7 +28,7 @@ void setup() {
 //// put your main code here, to run repeatedly:
 void loop() {
     // // (quick functioning test)
-    // digitalWrite(onboardLedPin, digitalRead(ledBtnPin));
+    // digitalWrite(boardLedPin, digitalRead(ledBtnPin));
 
     // // for board-controlled switch (not between power & board)
     // switchOn = digitalRead(switchPin);
@@ -40,7 +40,7 @@ void loop() {
     if(myServo.attached()) {
         curMillis = millis();
         discontinuous = digitalRead(contPin);  // HIGH & True == 1
-        if(twitch && curMillis - timer > delayMS) !discontinuous ? contFunc() : discontFunc();  // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired
+        if(curMillis - timer > delayMS) !discontinuous ? contFunc() : discontFunc();  // if accidental [continuity] disconnect then reconnect, it will still fxn as long as death twitch state not complete/expired
     } else {
         delay(500);
         return;
