@@ -9,12 +9,12 @@ void setup() {
     Serial.begin(9600);
     delay(1000);
 
-    // if button-controlled led for quick functioning test
-    pinMode(boardLedPin, OUTPUT);  // for board-controlled LED
-    pinMode(ledBtnPin, INPUT_PULLDOWN);  // makes default status of the D4 btn = 0 (as opposed to truthy)
+    // // if button-controlled led for quick functioning test
+    // pinMode(boardLedPin, OUTPUT);  // for board-controlled LED
+    // pinMode(ledBtnPin, INPUT_PULLDOWN);  // makes default status of the D4 btn = 0 (as opposed to truthy)
 
-    // board controlled switch (not between power & board)
-    pinMode(switchPin, INPUT_PULLUP);  // resistor needed for CPx onboard switch; 
+    // // board controlled switch (not between power & board)
+    // pinMode(switchPin, INPUT_PULLUP);  // resistor needed for CPx onboard switch; 
 
     // for mag connector/continuity
     pinMode(contPin, INPUT_PULLUP);  // uses onboard resistor; 
@@ -27,15 +27,15 @@ void setup() {
 
 //// put your main code here, to run repeatedly:
 void loop() {
-    // (quick functioning test)
-    digitalWrite(onboardLedPin, digitalRead(ledBtnPin));
+    // // (quick functioning test)
+    // digitalWrite(onboardLedPin, digitalRead(ledBtnPin));
 
-    // for board-controlled switch (not between power & board)
-    switchOn = digitalRead(switchPin);
-    if(!switchOn) {
-        delay(500);
-        return;
-    }
+    // // for board-controlled switch (not between power & board)
+    // switchOn = digitalRead(switchPin);
+    // if(!switchOn) {
+    //     delay(500);
+    //     return;
+    // }
 
     if(myServo.attached()) {
         curMillis = millis();
