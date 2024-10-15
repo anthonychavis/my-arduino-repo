@@ -1,6 +1,7 @@
 /*
 NOTE:
     - CPx refers to pins of the Circuit Playground Express
+    - QT = QT PY Pico
         - might have to change value for other boards
     - functions are not hoisted in this file
 */
@@ -24,7 +25,7 @@ uint16_t delayMS;
 // for servo
 // Servo library disables analogWrite() on pins 9 & 10 !!
 Servo myServo;
-#define servoPin 10  // A3 == D10 - CPx; pwm/~
+#define servoPin 26  // A3 == D10 - CPx; A0 == D26 - QT (unless using wifi?) ??; pwm/~; 5v
 // test higher minAng & lower maxAng first to check how much the gears amplify the angles !!
 const uint8_t minAng = 10;  // increased b/c the servo clicks & makes other weird noises
 const uint8_t maxAng = 170;  // reduced b/c the servo clicks & makes other weird noises
@@ -39,15 +40,15 @@ float accel = initAccel;
 
 // for mag connector
 bool discontinuous;
-#define contPin 1  // A7 == D1 - CPx; (digital input)
+#define contPin 15  // A7 == D1 - CPx; A3 == D15 - QT  (unless using wifi?) ??; digital input
 
-// board-controlled LED for quick functionin test
-#define ledBtnPin 4  // btn A - CPx
-#define boardLedPin 13  // D13 - CPx
+// // board-controlled LED for quick functionin test
+// #define ledBtnPin 4  // btn A - CPx
+// #define boardLedPin 13  // D13 - CPx
 
-// board controlled switch (not between power & board)
-bool switchOn;
-#define switchPin 7  // D7 - CPx
+// // board controlled switch (not between power & board)
+// bool switchOn;
+// #define switchPin 7  // D7 - CPx
 
 
 //// FUNCTIONS
