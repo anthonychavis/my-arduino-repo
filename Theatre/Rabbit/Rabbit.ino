@@ -46,5 +46,5 @@ void loop() {
         return;
     }
 
-    if(!twitch) myServo.detach();  // remove accidental movement of servo
+    if(!twitch) myServo.detach();  // remove accidental jerky movement of servo
 }

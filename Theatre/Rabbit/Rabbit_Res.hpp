@@ -14,7 +14,9 @@ TEST SPEED w/inline vs w/o inline
 - https://reference.arduino.cc/reference/en/language/functions/external-interrupts/digitalpintointerrupt/
 */
 
-#include <Servo.h> // look more into this ?? #define MAX_SERVOS 0 ?? 
+// #include <Servo.h> // look more into this ?? #define MAX_SERVOS 0 ?? 
+// if esp32 board:
+#include <ESP32Servo.h>
 
 // VARS
 
@@ -31,9 +33,14 @@ const uint8_t minAng = 10;  // increased b/c the servo clicks & makes other weir
 const uint8_t maxAng = 170;  // reduced b/c the servo clicks & makes other weird noises
 const uint8_t angRange = maxAng - minAng + 1;  // inclusive
 const uint8_t middleAng = angRange / 2;  // truncated
-const uint8_t initTwitchVal = 10;  // can calc this rather than hard code !!
-uint8_t twitch = initTwitchVal, prevAng, newAng;
+uint8_t prevAng, newAng;
+
+// const uint8_t initTwitchVal = 10;  // can calc this rather than hard code !!
+const uint16_t initTwitchVal = 1000;  // change if more time needed for accidental death; min = 0; max = 65025 [need to code in the limit]
+uint16_t twitch = initTwitchVal;
+
 bool decapped = false;
+
 const double vel = 60.0 / 250;  // degrees/millisecs
 const float initAccel = 1.1;
 float accel = initAccel;
@@ -110,5 +117,10 @@ void discontFunc() {
             // Serial.println(accel);
     }
     newAngTimer();
-    twitch--;
+
+    // extends accidental death allowance - see intTwitchVal
+    if(newAng == middleAng) {
+        twitch--;
+        delayMS = 300;
+    }
 }
