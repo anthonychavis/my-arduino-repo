@@ -28,6 +28,7 @@ uint16_t delayMS;
 // Servo library disables analogWrite() on pins 9 & 10 !!
 Servo myServo;
 #define servoPin 26  // A3 == D10 - CPx; A0 == D26 - QT (unless using wifi?) ??; pwm/~; 5v
+
 // test higher minAng & lower maxAng first to check how much the gears amplify the angles !!
 const uint8_t minAng = 10;  // increased b/c the servo clicks & makes other weird noises
 const uint8_t maxAng = 170;  // reduced b/c the servo clicks & makes other weird noises
@@ -36,7 +37,7 @@ const uint8_t middleAng = angRange / 2;  // truncated
 uint8_t prevAng, newAng;
 
 // const uint8_t initTwitchVal = 10;  // can calc this rather than hard code !!
-const uint16_t initTwitchVal = 1000;  // change if more time needed for accidental death; min = 0; max = 65025 [need to code in the limit]
+const uint16_t initTwitchVal = 1000;  // change value if more time needed for accidental death; min = 0; max = 65025 [need to code in the limit]
 uint16_t twitch = initTwitchVal;
 
 bool decapped = false;
@@ -74,7 +75,7 @@ void newAngTimer() {
     timer = curMillis;
 }
 
-// reset if accidental death
+// reset if accidental death; while twitch != 0
 inline
 void easterBunny() {
     twitch = initTwitchVal;
@@ -104,6 +105,12 @@ void discontFunc() {
             // Serial.println(newAng);
         delayMS = angDiffFunc() / vel + 251;
         decapped = true;
+    } else if(newAng == middleAng) {
+        // this block extends the accidental death allowance - see initTwitchVal
+        twitch--;
+        delayMS = 300;
+        timer = curMillis;
+        return;
     } else {
         if(middleAng < newAng && accel < middleAng) {
             newAng -= accel;
@@ -116,11 +123,5 @@ void discontFunc() {
             // Serial.println(newAng);
             // Serial.println(accel);
     }
-    newAngTimer();
-
-    // extends accidental death allowance - see intTwitchVal
-    if(newAng == middleAng) {
-        twitch--;
-        delayMS = 300;
-    }
+    newAngTimer();    
 }
