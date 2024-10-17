@@ -4,6 +4,7 @@ NOTE:
     - QT = QT PY ESP32 Pico
     - might have to change value for other boards
     - functions are not hoisted in this file
+    - servo power input - 5v
 */
 
 #if defined(ARDUINO_ARCH_ESP32)
@@ -31,17 +32,16 @@ NOTE:
 * change these pin values as needed for other boards
 */
     // for servo
-    #define servoPin 26  // A0 == D26 - QT (unless using wifi?) ??; pwm/~; 5v
+    #define servoPin 26  // A0 == D26 - QT (unless using wifi?) ??; pwm/~;
     // for mag connector/continuity
     #define contPin 15  // A3 == D15 - QT  (unless using wifi?) ??; digital input
 #endif
-
 
 // time
 unsigned long curMillis, timer = 0;
 uint16_t delayMS;
 
-// for servo [-- move to setup() in .ino !!]
+// for servo - 5v [-- move to setup() in .ino !!]
 Servo myServo;
 
 // test higher minAng & lower maxAng first to check how much the gears amplify the angles !!
@@ -50,16 +50,17 @@ const uint8_t maxAng = 170;  // reduced b/c the servo clicks & makes other weird
 const uint8_t angRange = maxAng - minAng + 1;  // inclusive
 const uint8_t middleAng = angRange / 2;  // truncated
 uint8_t prevAng, newAng;
+const double vel = 60.0 / 250;  // degrees/millisecs
 
 // dead
 const uint16_t initTwitchVal = 1000;  // change value if more time needed for accidental death; min = 0; max = 2^16 [need to code in the limit]; can calc this rather than hard code !!
 uint16_t twitch = initTwitchVal;
 bool decapped = false;
-const double vel = 60.0 / 250;  // degrees/millisecs
 const float initAccel = 1.1;
 float accel = initAccel;
 // for mag connector
 bool discontinuous;
+
 
 //// FUNCTIONS
 

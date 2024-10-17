@@ -3,7 +3,6 @@ NOTE:
     - CPx refers to pins of the Circuit Playground Express
     - QT = QT PY ESP32 Pico
     - might have to change value for other boards
-    - functions are not hoisted in this file
 */
 
 
