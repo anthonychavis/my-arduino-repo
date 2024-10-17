@@ -1,33 +1,48 @@
 /*
 NOTE:
     - CPx refers to pins of the Circuit Playground Express
-    - QT = QT PY Pico
-        - might have to change value for other boards
+    - QT = QT PY ESP32 Pico
+    - might have to change value for other boards
     - functions are not hoisted in this file
 */
 
+#if defined(ARDUINO_ARCH_ESP32)
+    #include <ESP32Servo.h>
+#else
+    #include <Servo.h>
+#endif
+
+//// VARS
+
+#if defined(__SAMD21G18A__)  // CPx
+    // board-controlled LED for quick functionin test
+    #define ledBtnPin 4  // btn A - CPx
+    #define boardLedPin 13  // D13 - CPx
+    // board controlled switch (not between power & board)
+    bool switchOn;
+    #define switchPin 7  // D7 - CPx
+    // for servo
+    #define servoPin 10  // A3 == D10 - CPx
+    // for mag connector/continuity
+    #define contPin 1  // A7 == D1 - CPx;
+#else
 /*
-TEST SPEED w/inline vs w/o inline
-
-#define digitalPinToInterrupt(P) ??
-- why interrupt ??
-- https://reference.arduino.cc/reference/en/language/functions/external-interrupts/digitalpintointerrupt/
+* for QT PY ESP32 Pico (until more specific, if possible);
+* change these pin values as needed for other boards
 */
+    // for servo
+    #define servoPin 26  // A0 == D26 - QT (unless using wifi?) ??; pwm/~; 5v
+    // for mag connector/continuity
+    #define contPin 15  // A3 == D15 - QT  (unless using wifi?) ??; digital input
+#endif
 
-// #include <Servo.h> // look more into this ?? #define MAX_SERVOS 0 ?? 
-// if esp32 board:
-#include <ESP32Servo.h>
-
-// VARS
 
 // time
 unsigned long curMillis, timer = 0;
 uint16_t delayMS;
 
-// for servo
-// Servo library disables analogWrite() on pins 9 & 10 !!
+// for servo [-- move to setup() in .ino !!]
 Servo myServo;
-#define servoPin 26  // A3 == D10 - CPx; A0 == D26 - QT (unless using wifi?) ??; pwm/~; 5v
 
 // test higher minAng & lower maxAng first to check how much the gears amplify the angles !!
 const uint8_t minAng = 10;  // increased b/c the servo clicks & makes other weird noises
@@ -36,28 +51,15 @@ const uint8_t angRange = maxAng - minAng + 1;  // inclusive
 const uint8_t middleAng = angRange / 2;  // truncated
 uint8_t prevAng, newAng;
 
-// const uint8_t initTwitchVal = 10;  // can calc this rather than hard code !!
-const uint16_t initTwitchVal = 1000;  // change value if more time needed for accidental death; min = 0; max = 65025 [need to code in the limit]
+// dead
+const uint16_t initTwitchVal = 1000;  // change value if more time needed for accidental death; min = 0; max = 2^16 [need to code in the limit]; can calc this rather than hard code !!
 uint16_t twitch = initTwitchVal;
-
 bool decapped = false;
-
 const double vel = 60.0 / 250;  // degrees/millisecs
 const float initAccel = 1.1;
 float accel = initAccel;
-
 // for mag connector
 bool discontinuous;
-#define contPin 15  // A7 == D1 - CPx; A3 == D15 - QT  (unless using wifi?) ??; digital input
-
-// // board-controlled LED for quick functionin test
-// #define ledBtnPin 4  // btn A - CPx
-// #define boardLedPin 13  // D13 - CPx
-
-// // board controlled switch (not between power & board)
-// bool switchOn;
-// #define switchPin 7  // D7 - CPx
-
 
 //// FUNCTIONS
 
