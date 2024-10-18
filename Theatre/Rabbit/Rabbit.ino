@@ -15,13 +15,13 @@ void setup() {
     delay(1000);
 
     // CPx
-    #if defined(__SAMD21G18A__)
+    if(issa_CPx) {
         // if button-controlled led for quick functioning test
         pinMode(boardLedPin, OUTPUT);  // for board-controlled LED
         pinMode(ledBtnPin, INPUT_PULLDOWN);  // makes default status of the D4 btn = 0 (as opposed to truthy)
         // board controlled switch (not between power & board)
         pinMode(switchPin, INPUT_PULLUP);  // resistor needed for CPx onboard switch; 
-    #endif
+    }
 
     // for mag connector/continuity
     pinMode(contPin, INPUT_PULLUP);  // uses onboard resistor; 
@@ -56,7 +56,7 @@ void setup() {
 //// put your main code here, to run repeatedly:
 void loop() {
     // CPx
-    #if defined(__SAMD21G18A__)
+    if(issa_CPx) {
         // (quick functioning test)
         digitalWrite(boardLedPin, digitalRead(ledBtnPin));
         // for board-controlled switch (not between power & board)
@@ -65,7 +65,7 @@ void loop() {
             delay(500);
             return;
         }
-    #endif
+    }
     // digitalWrite(PIN_NEOPIXEL, digitalRead(ledBtnPin));  // QT
 
     if(myServo.attached()) {

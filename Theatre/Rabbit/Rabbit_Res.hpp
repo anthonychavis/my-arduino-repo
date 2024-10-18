@@ -16,6 +16,7 @@ NOTE:
 //// VARS
 
 #if defined(__SAMD21G18A__)  // CPx
+    #define issa_CPx true
     // board-controlled LED for quick functionin test
     #define ledBtnPin 4  // btn A - CPx
     #define boardLedPin 13  // D13 - CPx
@@ -27,6 +28,7 @@ NOTE:
     // for mag connector/continuity
     #define contPin 1  // A7 == D1 - CPx;
 #else
+    #define issa_CPx false
 /*
 * for QT PY ESP32 Pico (until more specific, if possible);
 * change these pin values as needed for other boards
