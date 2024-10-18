@@ -7,20 +7,13 @@ NOTE:
     - servo power input - 5v
 */
 
-#ifndef RABBITCLASS_RES_H
+#ifndef RABBIT_RES_H
 
-#define RABBITCLASS_RES_H
+#define RABBIT_RES_H
 
-#if defined(ARDUINO_ARCH_ESP32)
-    #include <ESP32Servo.h>
-#else
-    #include <Servo.h>
-#endif
-
+// #include <optional>
 
 //// VARS
-
-// Servo myServo;
 
 // this conditional needs much improvement !!
 #if defined(__SAMD21G18A__)  // CPx
@@ -61,13 +54,13 @@ class Rabbit {
     Servo& servo;
 
     // alive
-    uint8_t minAng, maxAng;  // test higher minAng & lower maxAng first to check how much the gears amplify the angles !!
+    uint8_t minAng, maxAng;
     uint8_t middleAng, prevAng, newAng;
     const double vel = 60.0 / 250;  // degrees/millisecs
 
     // dead
-    const uint16_t initTwitchVal = 100;  // min = 0; max = 65536
-    uint16_t twitch = initTwitchVal;
+    const uint16_t initSurvivability = 100;  // min = 0; max = 65536
+    uint16_t survivability = initSurvivability;
     bool decapped = false, feetAtBigAng;
     const float initAccel = 1.1;
     float accel = initAccel;
@@ -92,7 +85,7 @@ class Rabbit {
 
     // reset if accidental death
     void easterBunny() {
-        twitch = initTwitchVal;
+        survivability = initSurvivability;
         decapped = false;
         accel = initAccel;
         prevAng = newAng;
@@ -105,18 +98,23 @@ public:
     // use "explicit" to prevent implicit conversions ??
     
     // test higher minAng & lower maxAng first to check how much the gears amplify the angles !!
-    explicit Rabbit(Servo& aServo, bool feetTowardsHighAng, uint8_t lowAng = 10, uint8_t highAng = 170) : servo(aServo), feetAtBigAng(feetTowardsHighAng), minAng(lowAng), maxAng(highAng) {
-        // if(lowAng is >= 0 && highAng <= 180 && highAng > lowAng) {
+    explicit Rabbit(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) : feetAtBigAng(feetTowardsHighAng), servo(aServo), minAng(lowAng), maxAng(highAng) {
             middleAng = getMidAng();
                 servo.attach(servoPin);
                 servo.write(middleAng);
-                prevAng = middleAng;
-        // }
+            prevAng = middleAng;
     }
 
+    // static std::optional<Rabbit> create(Servo& aServo, bool feetTowardsHighAng, uint8_t lowAng = 10, uint8_t highAng = 170) {
+    //     if(lowAng is <= 0 || highAng >= 180 || highAng < lowAng) {
+    //         return std::nullopt;
+    //     }
+            // print values !!
+    // }
+
     // alive; used while continuity through mag connector (or other method of continuity)
-    void contFunc() {
-        if(twitch != initTwitchVal) {
+    void struggle() {
+        if(survivability != initSurvivability) {
             easterBunny();
         }
         newAng = random(minAng, maxAng);
@@ -125,8 +123,8 @@ public:
         newAngTimer();
     }
 
-    // dead; used while NO continuity through mag connector (or other method of continuity); return to middle angle
-    void discontFunc() {
+    // dead; used while NO continuity through mag connector (or other method of continuity); ends at middleAng
+    void headless() {
         // rev depending on motor orientation w/model
             // use feetAtBigAng for automatic switch
         if(!decapped) {  
@@ -139,8 +137,8 @@ public:
             delayMS = angDiffFunc() / vel + 251;
             decapped = true;
         } else if(newAng == middleAng) {
-            // this block extends the accidental death allowance - see initTwitchVal
-            twitch--;
+            // this block extends the accidental death allowance - see initSurvivability
+            survivability--;
             delayMS = 300;
             timer = curMillis;
             return;
@@ -166,8 +164,9 @@ public:
         return servo.attached();
     }
 
-    uint8_t twitchState() {
-        return twitch;
+    uint16_t revivable() {
+        // need to add check in case type is changed again !!
+        return survivability;
     }
 
     void servoDetach() {
