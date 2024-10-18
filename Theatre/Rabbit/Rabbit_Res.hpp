@@ -1,11 +1,15 @@
 /*
 NOTE:
     - CPx refers to pins of the Circuit Playground Express
-    - QT = QT PY ESP32 Pico
-    - might have to change value for other boards
+    - QT refers to the QT PY Pico
+    - might have to change pin value for other boards
     - functions are not hoisted in this file
     - servo power input - 5v
 */
+
+#ifndef RABBIT_RES_H
+
+#define RABBIT_RES_H
 
 #if defined(ARDUINO_ARCH_ESP32)
     #include <ESP32Servo.h>
@@ -89,17 +93,19 @@ void easterBunny() {
     prevAng = newAng;
 }
 
-// used while continuity through mag connector (or other method of continuity)
+// alive; used while continuity through mag connector (or other method of continuity)
 inline
 void contFunc() {
-    if(twitch != initTwitchVal) easterBunny();
+    if(twitch != initTwitchVal) {
+        easterBunny();
+    }
     newAng = random(minAng, maxAng);
     delayMS = angDiffFunc() / vel + 1;
     prevAng = newAng;
     newAngTimer();
 }
 
-// used while NO continuity through mag connector (or other method of continuity); return to middle angle
+// dead; used while NO continuity through mag connector (or other method of continuity); return to middle angle
 inline
 void discontFunc() {
     // rev depending on motor orientation w/model
@@ -130,3 +136,5 @@ void discontFunc() {
     }
     newAngTimer();    
 }
+
+#endif
