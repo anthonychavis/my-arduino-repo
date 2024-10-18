@@ -6,13 +6,19 @@ NOTE:
 */
 
 
+#if defined(ARDUINO_ARCH_ESP32)
+    #include <ESP32Servo.h>
+#else
+    #include <Servo.h>
+#endif
+
 #include "Rabbit_Res.hpp"
 
-        // pass by reference ?? Passing the dependency by reference ensures that you're working with the same instance of the object throughout the lifetime of MyClass. ??
+        // pass by reference ?? Passing the dependency by reference ensures that you're working with the same instance of the object throughout the lifetime of th object. ??
         // should these be instantiated here ??
             // how are they removed from the stack if here ??
 Servo myServo;
-Rabbit fluffyCute(myServo, true, 20, 160);  // explicit constructor call
+Rabbit fluffyCute(true, myServo, 20, 160);  // explicit constructor call
     // delete the objects ?? in destructor ??
 
 //// put your setup code here, to run once:
@@ -56,14 +62,14 @@ void loop() {
         curMillis = millis();
         discontinuous = digitalRead(contPin);  // HIGH & True == 1; (0V input read at pin) LOW & False == 0
         if(curMillis - timer > delayMS) {
-            !discontinuous ? fluffyCute.contFunc() : fluffyCute.discontFunc();
+            !discontinuous ? fluffyCute.struggle() : fluffyCute.headless();
         }
     } else {
         delay(500);
         return;
     }
 
-    if(!fluffyCute.twitchState()) {
+    if(!fluffyCute.revivable()) {
         fluffyCute.servoDetach();
     }
 }
