@@ -1,8 +1,8 @@
 /*
 NOTE:
     - CPx refers to pins of the Circuit Playground Express
-    - QT = QT PY ESP32 Pico
-    - might have to change value for other boards
+    - QT refers to the QT PY Pico
+    - might have to change pin value for other boards
 */
 
 
@@ -14,7 +14,7 @@ void setup() {
     Serial.begin(9600);
     delay(1000);
 
-    // CPx
+    // CPx; needs work:
     if(issa_CPx) {
         // if button-controlled led for quick functioning test
         pinMode(boardLedPin, OUTPUT);  // for board-controlled LED
@@ -30,32 +30,13 @@ void setup() {
     myServo.attach(servoPin);
     myServo.write(middleAng);
     prevAng = middleAng;
+
     delay(1000);
-
-                // #if defined(ARDUINO_SAMD_ZERO)
-                //   Serial.println("bingo");
-                // #endif
-
-    // #if defined(ARDUINO_ARCH_ESP32)
-    //     Serial.println("ESP32");
-    // #elif defined(ATSAMD21G18A)
-    //     Serial.println("probably be CPX");
-    // #elif defined(__ATSAMD21G18A__)
-    //     Serial.println("probably be CPX");
-    // #elif defined(CP_Boards)
-    //     Serial.println("probably be CPX");
-    // // #elif defined(ARDUINO_ARCH_SAMD)
-    // //     Serial.println("might be CPX");
-    // #elif defined(__SAMD21G18A__)
-    //     Serial.println("totally be CPX");
-    // #else
-    //     Serial.println("not ESP32");
-    // #endif
 }
 
 //// put your main code here, to run repeatedly:
 void loop() {
-    // CPx
+    // CPx; needs work:
     if(issa_CPx) {
         // (quick functioning test)
         digitalWrite(boardLedPin, digitalRead(ledBtnPin));
@@ -66,12 +47,13 @@ void loop() {
             return;
         }
     }
-    // digitalWrite(PIN_NEOPIXEL, digitalRead(ledBtnPin));  // QT
 
     if(myServo.attached()) {
         curMillis = millis();
         discontinuous = digitalRead(contPin);  // HIGH & True == 1
-        if(curMillis - timer > delayMS) !discontinuous ? contFunc() : discontFunc();
+        if(curMillis - timer > delayMS) {
+            !discontinuous ? contFunc() : discontFunc();
+        }
     } else {
         delay(500);
         return;
