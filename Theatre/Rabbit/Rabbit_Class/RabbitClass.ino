@@ -56,9 +56,9 @@ void setup() {
 //// put your main code here, to run repeatedly:
 void loop() {
     // printServoPos(myServo);  // comment out or remove when not troubleshooting
-    // printServoPos(myServo, 70);  // comment out or remove when not troubleshooting
+    // printServoPos(myServo, 70);  // don't use while main code is active; comment out or remove when not troubleshooting
     // fluffyCute.printServoPos();  // comment out or remove when not troubleshooting
-    // fluffyCute.printServoPos(50);  // comment out or remove when not troubleshooting
+    // fluffyCute.printServoPos(50);  // don't use while main code is active; comment out or remove when not troubleshooting
 
     // CPx; needs work:
     if(issa_CPx) {

@@ -65,7 +65,7 @@ void printServoPos(Servo servoObj) {
     Serial.println(ang);
     delay(1000);
 };
-// serial print servoObj position in microseconds at specified angle
+// don't use while main code is active; serial print servoObj position in microseconds at specified angle
 void printServoPos(Servo servoObj, int angle) {
     if(angle > 180 || angle < 0) {
         Serial.print("adhere to 0 <= angle <= 180; you entered: ");
@@ -235,7 +235,7 @@ public:
     //     Serial.println(ang);
     //     delay(1000);
     // }
-    // // serial print servo position in microseconds at specified angle
+    // // don't use while main code is active; serial print servo position in microseconds at specified angle
     // void printServoPos(int angle) {
     //     if(angle > 180 || angle < 0) {
     //         Serial.print("adhere to 0 <= angle <= 180; you entered: ");
