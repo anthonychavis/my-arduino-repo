@@ -183,6 +183,8 @@ public:
                     newAng -= accel;
                 } else if(middleAng > newAng && !feetAtMaxAng) {
                     newAng += accel;
+                } else {
+                    newAng = middleAng;
                 }
                 accel *= accel;
             } else {
