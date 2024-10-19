@@ -54,7 +54,7 @@ Servo myServo;
 const uint8_t minAng = 10;  // increased b/c the servo clicks & makes other weird noises
 const uint8_t maxAng = 170;  // reduced b/c the servo clicks & makes other weird noises
 const uint8_t angRange = maxAng - minAng + 1;  // inclusive
-const uint8_t middleAng = angRange / 2;  // truncated
+const uint8_t middleAng = angRange / 2 + minAng;  // truncated
 uint8_t prevAng, newAng;
 const double vel = 60.0 / 250;  // degrees/millisecs
 
