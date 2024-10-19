@@ -3,15 +3,12 @@ NOTE:
     - CPx refers to pins of the Circuit Playground Express
     - QT refers to the QT PY Pico
     - might have to change pin value for other boards
-    - functions are not hoisted in this file
-    - servo power input - 5v
 */
 
 #ifndef RABBIT_RES_H
 
 #define RABBIT_RES_H
 
-// #include <optional>
 
 //// VARS
 
@@ -53,7 +50,6 @@ bool discontinuous;
 class Rabbit {
     Servo& servo;
 
-    // alive
     uint8_t minAng, maxAng;
     uint8_t middleAng, prevAng, newAng;
     const double vel = 60.0 / 250;  // degrees/millisecs
@@ -61,14 +57,14 @@ class Rabbit {
     // dead
     const uint16_t initSurvivability = 100;  // min = 0; max = 65536
     uint16_t survivability = initSurvivability;
-    bool decapped = false, feetAtBigAng;
+    bool decapped = false, feetAtMaxAng;
     const float initAccel = 1.1;
     float accel = initAccel;
 
     // METHODS
 
-    uint8_t getMidAng() {
-        return (maxAng - minAng + 1) / 2;  // truncated
+    uint8_t setMidAng() {
+        return (maxAng - minAng + 1) / 2 + minAng;  // truncated
     }  // might need a neutralAng depending on how it fxns w/model
 
     // return angle difference
@@ -96,10 +92,12 @@ public:
             // destructor not needed in this case b/c this class does not "own" the dependency; aka it was instantiated elsewhere
                 // how to remove from stack if instantiated in global scope ??
     // use "explicit" to prevent implicit conversions ??
-    
-    // test higher minAng & lower maxAng first to check how much the gears amplify the angles !!
-    explicit Rabbit(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) : feetAtBigAng(feetTowardsHighAng), servo(aServo), minAng(lowAng), maxAng(highAng) {
-            middleAng = getMidAng();
+
+    // Test higher lowAng & lower highAng first to check how much the gears amplify the angles !!
+    explicit Rabbit(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) :
+        feetAtMaxAng(feetTowardsHighAng), servo(aServo), minAng(lowAng), maxAng(highAng)
+    {
+            middleAng = setMidAng();
                 servo.attach(servoPin);
                 servo.write(middleAng);
             prevAng = middleAng;
@@ -126,12 +124,11 @@ public:
     // dead; used while NO continuity through mag connector (or other method of continuity); ends at middleAng
     void headless() {
         // rev depending on motor orientation w/model
-            // use feetAtBigAng for automatic switch
         if(!decapped) {  
             // could add code for if position greater than 3/4 at start of this block !!
             delay(50);
-            newAng = middleAng * 7 / 4;  // change to 1/4 if oriented in other direction; imagery = should curl up before loosening
-            // newAng = middleAng * (feetAtBigAng ? 7 : 1) / 4;  // check if this syntax works !!
+            // imagery = should curl up before loosening
+            newAng = feetAtMaxAng ? middleAng * 7 / 4 :  middleAng / 4;
                 Serial.print("newAng when decapped < 1: ");
                 Serial.println(newAng);
             delayMS = angDiffFunc() / vel + 251;
@@ -143,9 +140,12 @@ public:
             timer = curMillis;
             return;
         } else {
-            // use feetAtBigAng to alter this !!
-            if(middleAng < newAng && accel < middleAng) {
-                newAng -= accel;
+            if(accel < middleAng) {
+                if(middleAng < newAng && feetAtMaxAng) {
+                    newAng -= accel;
+                } else if(middleAng > newAng && !feetAtMaxAng) {
+                    newAng += accel;
+                }
                 accel *= accel;
             } else {
                 newAng = middleAng;
@@ -171,6 +171,18 @@ public:
 
     void servoDetach() {
         servo.detach();
+    }
+
+    uint8_t getMinAng() {
+        return minAng;
+    }
+    
+    uint8_t getMiddleAng() {
+        return middleAng;
+    }
+
+    uint8_t getMaxAng() {
+        return maxAng;
     }
 };
 
