@@ -5,20 +5,29 @@ NOTE:
     - might have to change pin value for other boards
 */
 
-
 #if defined(ARDUINO_ARCH_ESP32)
     #include <ESP32Servo.h>
 #else
     #include <Servo.h>
 #endif
 
+// #include "RabbitClass_Res.hpp"
 #include "Rabbit_Res.hpp"
 
         // pass by reference ?? Passing the dependency by reference ensures that you're working with the same instance of the object throughout the lifetime of th object. ??
         // should these be instantiated here ??
             // how are they removed from the stack if here ??
+
+// Servo object instantiated from a Servo library
 Servo myServo;
-Rabbit fluffyCute(true, myServo, 20, 160);  // explicit constructor call
+/*
+(explicit constructor call);
+param1: rabbit feet are towards the higher angles?;
+param2: Servo object;
+param3: mimimum angle in range;
+param4: maximum angle in range;
+*/
+Rabbit fluffyCute(true, myServo, 20, 160);
     // delete the objects ?? in destructor ??
 
 //// put your setup code here, to run once:
@@ -37,7 +46,7 @@ void setup() {
     }
 
     // for mag connector/continuity
-    pinMode(contPin, INPUT_PULLUP);  // uses onboard resistor; 
+    pinMode(contPin, INPUT_PULLUP);  // uses onboard resistor;
 
 // HOW TO CREATE RABBIT FOR GLOBAL ACCESS, BUT ATTACH PIN HERE ?? !!
 
@@ -46,6 +55,11 @@ void setup() {
 
 //// put your main code here, to run repeatedly:
 void loop() {
+    // printServoPos(myServo);  // comment out or remove when not troubleshooting
+    // printServoPos(myServo, 70);  // comment out or remove when not troubleshooting
+    // fluffyCute.printServoPos();  // comment out or remove when not troubleshooting
+    // fluffyCute.printServoPos(50);  // comment out or remove when not troubleshooting
+
     // CPx; needs work:
     if(issa_CPx) {
         // (quick functioning test)
@@ -72,4 +86,6 @@ void loop() {
     if(!fluffyCute.revivable()) {
         fluffyCute.servoDetach();
     }
+
+    // fluffyCute.printServoPos();  // comment out or remove when not troubleshooting
 }

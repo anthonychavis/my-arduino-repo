@@ -1,14 +1,13 @@
+#ifndef RABBIT_RES_H
+
+#define RABBIT_RES_H
+
 /*
 NOTE:
     - CPx refers to pins of the Circuit Playground Express
     - QT refers to the QT PY Pico
     - might have to change pin value for other boards
 */
-
-#ifndef RABBIT_RES_H
-
-#define RABBIT_RES_H
-
 
 //// VARS
 
@@ -26,15 +25,24 @@ NOTE:
     // for mag connector/continuity
     #define contPin 1  // A7 == D1 - CPx;
 #else
-    #define issa_CPx false
+//     #define issa_CPx false
+// /*
+// * for QT PY ESP32 Pico (until more specific, if possible);
+// * change these pin values as needed for other boards
+// */
+//     // for servo
+//     #define servoPin 26  // A0 == D26 - QT (unless using wifi?) ??; pwm/~;
+//     // for mag connector/continuity
+//     #define contPin 15  // A3 == D15 - QT  (unless using wifi?) ??; digital input
+
 /*
-* for QT PY ESP32 Pico (until more specific, if possible);
-* change these pin values as needed for other boards
+* for RP2040 Prop-Maker Feather (until more specific, if possible);
+* change these pin values as needed
 */
     // for servo
-    #define servoPin 26  // A0 == D26 - QT (unless using wifi?) ??; pwm/~;
+    #define servoPin pinNumber
     // for mag connector/continuity
-    #define contPin 15  // A3 == D15 - QT  (unless using wifi?) ??; digital input
+    #define contPin 15  // 
 #endif
 
 // time
@@ -43,6 +51,36 @@ uint16_t delayMS;
 
 // for mag connector
 bool discontinuous;
+
+
+//// FUNCTIONS
+
+// serial print servoObj position in microseconds
+void printServoPos(Servo servoObj) {
+    int microsec = servoObj.readMicroseconds();
+    int ang = servoObj.read();
+    Serial.print("Servo position in microseconds: ");
+    Serial.println(microsec);
+    Serial.print("Servo position in angle: ");
+    Serial.println(ang);
+    delay(1000);
+};
+// serial print servoObj position in microseconds at specified angle
+void printServoPos(Servo servoObj, int angle) {
+    if(angle > 180 || angle < 0) {
+        Serial.print("adhere to 0 <= angle <= 180; you entered: ");
+        Serial.println(angle);
+        return;
+    }
+    servoObj.write(angle);
+    int microsec = servoObj.readMicroseconds();
+    int ang = servoObj.read();
+    Serial.print("Servo position in microseconds: ");
+    Serial.println(microsec);
+    Serial.print("Servo position in angle: ");
+    Serial.println(ang);
+    delay(1000);
+};
 
 
 //// CLASSES 
@@ -94,6 +132,7 @@ public:
     // use "explicit" to prevent implicit conversions ??
 
     // Test higher lowAng & lower highAng first to check how much the gears amplify the angles !!
+    // negative values may result in unexpected behavior
     explicit Rabbit(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) :
         feetAtMaxAng(feetTowardsHighAng), servo(aServo), minAng(lowAng), maxAng(highAng)
     {
@@ -184,6 +223,33 @@ public:
     uint8_t getMaxAng() {
         return maxAng;
     }
+
+    // // serial print servo position in microseconds
+    // void printServoPos() {
+    //     int microsec = servo.readMicroseconds();
+    //     int ang = servo.read();
+    //     Serial.print("Servo position in microseconds: ");
+    //     Serial.println(microsec);
+    //     Serial.print("Servo position in angle: ");
+    //     Serial.println(ang);
+    //     delay(1000);
+    // }
+    // // serial print servo position in microseconds at specified angle
+    // void printServoPos(int angle) {
+    //     if(angle > 180 || angle < 0) {
+    //         Serial.print("adhere to 0 <= angle <= 180; you entered: ");
+    //         Serial.println(angle);
+    //         return;
+    //     }
+    //     servo.write(angle);
+    //     int microsec = servo.readMicroseconds();
+    //     int ang = servo.read();
+    //     Serial.print("Servo position in microseconds: ");
+    //     Serial.println(microsec);
+    //     Serial.print("Servo position in angle: ");
+    //     Serial.println(ang);
+    //     delay(1000);
+    // }
 };
 
 #endif
