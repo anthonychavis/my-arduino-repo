@@ -70,6 +70,7 @@ void printServoPos(Servo servoObj, int angle) {
     if(angle > 180 || angle < 0) {
         Serial.print("adhere to 0 <= angle <= 180; you entered: ");
         Serial.println(angle);
+        delay(1000);
         return;
     }
     servoObj.write(angle);
@@ -239,6 +240,7 @@ public:
     //     if(angle > 180 || angle < 0) {
     //         Serial.print("adhere to 0 <= angle <= 180; you entered: ");
     //         Serial.println(angle);
+    //         delay(1000);
     //         return;
     //     }
     //     servo.write(angle);
