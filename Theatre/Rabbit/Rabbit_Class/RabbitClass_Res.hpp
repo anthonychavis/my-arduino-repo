@@ -132,7 +132,7 @@ public:
     // use "explicit" to prevent implicit conversions ??
 
     // Test higher lowAng & lower highAng first to check how much the gears amplify the angles !!
-    // negative values may result in unexpected behavior
+    // negative values may result in unexpected behavior - for now
     explicit Rabbit(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) :
         feetAtMaxAng(feetTowardsHighAng), servo(aServo), minAng(lowAng), maxAng(highAng)
     {
@@ -162,9 +162,7 @@ public:
 
     // dead; used while NO continuity through mag connector (or other method of continuity); ends at middleAng
     void headless() {
-        // rev depending on motor orientation w/model
         if(!decapped) {  
-            // could add code for if position greater than 3/4 at start of this block !!
             delay(50);
             // imagery = should curl up before loosening
             newAng = feetAtMaxAng ? middleAng * 7 / 4 :  middleAng / 4;
@@ -223,6 +221,8 @@ public:
     uint8_t getMaxAng() {
         return maxAng;
     }
+
+    // FOR TESTING
 
     // // serial print servo position in microseconds
     // void printServoPos() {
