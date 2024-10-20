@@ -1,5 +1,6 @@
 /*
 NOTE:
+    - Must find the servo's min/max pulse width (microseconds)
     - CPx refers to pins of the Circuit Playground Express
     - QT refers to the QT PY Pico
     - might have to change pin value for other boards
@@ -18,8 +19,15 @@ NOTE:
         // should these be instantiated here ??
             // how are they removed from the stack if here ??
 
+/*
+- test servo min/max pulse width before running Rabbit
+- set TestingMyServo to true when testing Servo; false otherwise
+*/
+#define TestingMyServo true
+
 // Servo object instantiated from a Servo library
 Servo myServo;
+
 /*
 (explicit constructor call);
 param1: rabbit feet are towards the higher angles?;
@@ -27,8 +35,7 @@ param2: Servo object;
 param3: mimimum angle in range;
 param4: maximum angle in range;
 */
-Rabbit fluffyCute(true, myServo, 20, 160);
-    // delete the objects ?? in destructor ??
+Rabbit fluffyCute(true, myServo, 0, 180);
 
 //// put your setup code here, to run once:
 void setup() {
@@ -48,18 +55,11 @@ void setup() {
     // for mag connector/continuity
     pinMode(contPin, INPUT_PULLUP);  // uses onboard resistor;
 
-// HOW TO CREATE RABBIT FOR GLOBAL ACCESS, BUT ATTACH PIN HERE ?? !!
-
     delay(1000);
 }
 
 //// put your main code here, to run repeatedly:
 void loop() {
-    // printServoPos(myServo);  // comment out or remove when not troubleshooting
-    // printServoPos(myServo, 70);  // don't use while main code is active; comment out or remove when not troubleshooting
-    // fluffyCute.printServoPos();  // comment out or remove when not troubleshooting
-    // fluffyCute.printServoPos(50);  // don't use while main code is active; comment out or remove when not troubleshooting
-
     // CPx; needs work:
     if(issa_CPx) {
         // (quick functioning test)
@@ -72,20 +72,25 @@ void loop() {
         }
     }
 
-    if(fluffyCute.servoAttached()) {
-        curMillis = millis();
-        discontinuous = digitalRead(contPin);  // HIGH & True == 1; (0V input read at pin) LOW & False == 0
-        if(curMillis - timer > delayMS) {
-            !discontinuous ? fluffyCute.struggle() : fluffyCute.headless();
-        }
+    if(TestingMyServo) {
+        // used to help find the min pulse width; adjust MIN_PULSE_WIDTH value in .hpp file
+        printServoPos(myServo, 0);
+        // used to help find the max pulse width; adjust MAX_PULSE_WIDTH value in .hpp file
+        printServoPos(myServo, 180);
     } else {
-        delay(500);
-        return;
-    }
+        if(fluffyCute.servoAttached()) {
+            curMillis = millis();
+            discontinuous = digitalRead(contPin);  // HIGH & True == 1; (0V input read at pin) LOW & False == 0
+            if(curMillis - timer > delayMS) {
+                !discontinuous ? fluffyCute.struggle() : fluffyCute.headless();
+            }
+        } else {
+            delay(500);
+            return;
+        }
 
-    if(!fluffyCute.revivable()) {
-        fluffyCute.servoDetach();
+        if(!fluffyCute.revivable()) {
+            fluffyCute.servoDetach();
+        }
     }
-
-    // fluffyCute.printServoPos();  // comment out or remove when not troubleshooting
 }

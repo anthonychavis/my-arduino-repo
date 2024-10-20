@@ -4,6 +4,7 @@
 
 /*
 NOTE:
+    - Must find the servo's min/max pulse width (microseconds)
     - CPx refers to pins of the Circuit Playground Express
     - QT refers to the QT PY Pico
     - might have to change pin value for other boards
@@ -45,6 +46,21 @@ NOTE:
     #define contPin 15  // 
 #endif
 
+/*
+for servo
+- assign the tested min/max pulse widths respectively
+- could start with the values given in the servo spec sheet
+- default was 540 & 2400 for Servo.h
+*/
+#ifdef MIN_PULSE_WIDTH
+#undef MIN_PULSE_WIDTH
+#endif
+#ifdef MAX_PULSE_WIDTH
+#undef MAX_PULSE_WIDTH
+#endif
+#define MIN_PULSE_WIDTH 532
+#define MAX_PULSE_WIDTH 2120
+
 // time
 unsigned long curMillis, timer = 0;
 uint16_t delayMS;
@@ -59,28 +75,30 @@ bool discontinuous;
 void printServoPos(Servo servoObj) {
     int microsec = servoObj.readMicroseconds();
     int ang = servoObj.read();
+    Serial.println("---");
     Serial.print("Servo position in microseconds: ");
     Serial.println(microsec);
     Serial.print("Servo position in angle: ");
     Serial.println(ang);
-    delay(1000);
+    delay(2000);
 };
 // don't use while main code is active; serial print servoObj position in microseconds at specified angle
 void printServoPos(Servo servoObj, int angle) {
     if(angle > 180 || angle < 0) {
         Serial.print("adhere to 0 <= angle <= 180; you entered: ");
         Serial.println(angle);
-        delay(1000);
+        delay(2000);
         return;
     }
     servoObj.write(angle);
     int microsec = servoObj.readMicroseconds();
     int ang = servoObj.read();
+    Serial.println("---");
     Serial.print("Servo position in microseconds: ");
     Serial.println(microsec);
     Serial.print("Servo position in angle: ");
     Serial.println(ang);
-    delay(1000);
+    delay(2000);
 };
 
 
@@ -89,8 +107,8 @@ void printServoPos(Servo servoObj, int angle) {
 class Rabbit {
     Servo& servo;
 
-    uint8_t minAng, maxAng;
-    uint8_t middleAng, prevAng, newAng;
+    uint8_t minAng, maxAng, angRange, middleAng;
+    uint8_t prevAng, newAng;
     const double vel = 60.0 / 250;  // degrees/millisecs
 
     // dead
@@ -103,7 +121,7 @@ class Rabbit {
     // METHODS
 
     uint8_t setMidAng() {
-        return (maxAng - minAng + 1) / 2 + minAng;  // truncated
+        return (angRange + 1) / 2 + minAng;  // truncated
     }  // might need a neutralAng depending on how it fxns w/model
 
     // return angle difference
@@ -137,8 +155,9 @@ public:
     explicit Rabbit(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) :
         feetAtMaxAng(feetTowardsHighAng), servo(aServo), minAng(lowAng), maxAng(highAng)
     {
+            angRange = maxAng - middleAng + 1;
             middleAng = setMidAng();
-                servo.attach(servoPin);
+                servo.attach(servoPin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
                 servo.write(middleAng);
             prevAng = middleAng;
     }
@@ -166,7 +185,7 @@ public:
         if(!decapped) {  
             delay(50);
             // imagery = should curl up before loosening
-            newAng = feetAtMaxAng ? middleAng * 7 / 4 :  middleAng / 4;
+            newAng = feetAtMaxAng ? maxAng - angRange / 10 : minAng + angRange / 10;
                 Serial.print("newAng when decapped < 1: ");
                 Serial.println(newAng);
             delayMS = angDiffFunc() / vel + 251;
@@ -231,28 +250,30 @@ public:
     // void printServoPos() {
     //     int microsec = servo.readMicroseconds();
     //     int ang = servo.read();
+    //     Serial.println("---");
     //     Serial.print("Servo position in microseconds: ");
     //     Serial.println(microsec);
     //     Serial.print("Servo position in angle: ");
     //     Serial.println(ang);
-    //     delay(1000);
+    //     delay(2000);
     // }
     // // don't use while main code is active; serial print servo position in microseconds at specified angle
     // void printServoPos(int angle) {
     //     if(angle > 180 || angle < 0) {
     //         Serial.print("adhere to 0 <= angle <= 180; you entered: ");
     //         Serial.println(angle);
-    //         delay(1000);
+    //         delay(2000);
     //         return;
     //     }
     //     servo.write(angle);
     //     int microsec = servo.readMicroseconds();
     //     int ang = servo.read();
+    //     Serial.println("---");
     //     Serial.print("Servo position in microseconds: ");
     //     Serial.println(microsec);
     //     Serial.print("Servo position in angle: ");
     //     Serial.println(ang);
-    //     delay(1000);
+    //     delay(2000);
     // }
 };
 
