@@ -121,7 +121,7 @@ class Rabbit {
     // METHODS
 
     uint8_t setMidAng() {
-        return (angRange + 1) / 2 + minAng;  // truncated
+        return angRange / 2 + minAng;  // truncated
     }  // might need a neutralAng depending on how it fxns w/model
 
     // return angle difference
