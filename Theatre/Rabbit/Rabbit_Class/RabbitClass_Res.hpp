@@ -155,7 +155,7 @@ public:
     explicit Rabbit(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) :
         feetAtMaxAng(feetTowardsHighAng), servo(aServo), minAng(lowAng), maxAng(highAng)
     {
-            angRange = maxAng - middleAng + 1;
+            angRange = maxAng - minAng + 1;
             middleAng = setMidAng();
                 servo.attach(servoPin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
                 servo.write(middleAng);
