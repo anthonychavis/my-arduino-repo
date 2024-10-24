@@ -14,8 +14,11 @@ NOTE:
 
 // this conditional needs much improvement !!
 #if defined(__SAMD21G18A__)  // CPx
-    #define issa_CPx true
-    // board-controlled LED for quick functionin test
+    #define issa_CPx
+#endif
+
+#ifdef issa_CPx
+ // board-controlled LED for quick functionin test
     #define ledBtnPin 4  // btn A - CPx
     #define boardLedPin 13  // D13 - CPx
     // board controlled switch (not between power & board)
@@ -26,10 +29,9 @@ NOTE:
     // for mag connector/continuity
     #define contPin 1  // A7 == D1 - CPx;
 #else
-//     #define issa_CPx false
 // /*
-// * for QT PY ESP32 Pico (until more specific, if possible);
-// * change these pin values as needed for other boards
+//     - for QT PY ESP32 Pico (until more specific, if possible);
+//     - change these pin values as needed for other boards
 // */
 //     // for servo
 //     #define servoPin 26  // A0 == D26 - QT (unless using wifi?) ??; pwm/~;
@@ -37,13 +39,13 @@ NOTE:
 //     #define contPin 15  // A3 == D15 - QT  (unless using wifi?) ??; digital input
 
 /*
-* for RP2040 Prop-Maker Feather (until more specific, if possible);
-* change these pin values as needed
+    - for other board
+    - change these pin values as needed
 */
     // for servo
-    #define servoPin pinNumber
+    #define servoPin pinNumber  // change as needed
     // for mag connector/continuity
-    #define contPin 15  // 
+    #define contPin 15  // change as needed
 #endif
 
 /*
@@ -145,10 +147,10 @@ class Rabbit {
     }
 
 public:
-        // Passing the dependency by reference ensures that you're working with the same instance of the object throughout the lifetime of the object. ??
+        // Passing the dependency by reference ensures that you're working with the same instance of the object throughout the lifetime of the object.
             // destructor not needed in this case b/c this class does not "own" the dependency; aka it was instantiated elsewhere
                 // how to remove from stack if instantiated in global scope ??
-    // use "explicit" to prevent implicit conversions ??
+    // use "explicit" to prevent implicit conversions
 
     // Test higher lowAng & lower highAng first to check how much the gears amplify the angles !!
     // negative values may result in unexpected behavior - for now
@@ -242,6 +244,10 @@ public:
 
     uint8_t getMaxAng() {
         return maxAng;
+    }
+
+    uint8_t getAngRange() {
+        return angRange;
     }
 
     // FOR TESTING
