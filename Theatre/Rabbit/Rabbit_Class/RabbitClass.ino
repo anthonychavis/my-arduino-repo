@@ -35,7 +35,8 @@ param2: Servo object;
 param3: mimimum angle in range;
 param4: maximum angle in range;
 */
-Rabbit fluffyCute(true, myServo, 0, 180);
+auto fluffyCute = Rabbit::create(true, myServo, 0, 180);
+// Rabbit fluffyCute(true, myServo, 0, 180);
 
 //// put your setup code here, to run once:
 void setup() {
@@ -78,7 +79,8 @@ void loop() {
         return;
     }
 
-    if(!fluffyCute.servoAttached()) {
+    // if(!fluffyCute.servoAttached()) {
+    if(!fluffyCute->servoAttached()) {
         delay(500);
         return;
     }
@@ -86,10 +88,13 @@ void loop() {
     curMillis = millis();
     if(curMillis - timer > delayMS) {
         discontinuous = digitalRead(contPin);  // HIGH & True == 1;
-        !discontinuous ? fluffyCute.struggle() : fluffyCute.headless();
+        // !discontinuous ? fluffyCute.struggle() : fluffyCute.headless();
+        !discontinuous ? fluffyCute->struggle() : fluffyCute->headless();
     }
 
-    if(!fluffyCute.revivable()) {
-        fluffyCute.servoDetach();
+    // if(!fluffyCute.revivable()) {
+    if(!fluffyCute->revivable()) {
+        // fluffyCute.servoDetach();
+        fluffyCute->servoDetach();
     }
 }

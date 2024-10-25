@@ -10,6 +10,8 @@ NOTE:
     - might have to change pin value for other boards
 */
 
+#include <memory>
+
 //// VARS
 
 // this conditional needs much improvement !!
@@ -74,17 +76,19 @@ bool discontinuous;
 //// FUNCTIONS
 
 // serial print servoObj position in microseconds
+inline
 void printServoPos(Servo servoObj) {
     int microsec = servoObj.readMicroseconds();
     int ang = servoObj.read();
     Serial.println("---");
     Serial.print("Servo position in microseconds: ");
     Serial.println(microsec);
-    Serial.print("Servo position in angle: ");
+    Serial.print("Servo position in degrees: ");
     Serial.println(ang);
     delay(2000);
 };
 // don't use while main code is active; serial print servoObj position in microseconds at specified angle
+inline
 void printServoPos(Servo servoObj, int angle) {
     if(angle > 180 || angle < 0) {
         Serial.print("adhere to 0 <= angle <= 180; you entered: ");
@@ -98,7 +102,7 @@ void printServoPos(Servo servoObj, int angle) {
     Serial.println("---");
     Serial.print("Servo position in microseconds: ");
     Serial.println(microsec);
-    Serial.print("Servo position in angle: ");
+    Serial.print("Servo position in degrees: ");
     Serial.println(ang);
     delay(2000);
 };
@@ -146,7 +150,6 @@ class Rabbit {
         prevAng = newAng;
     }
 
-public:
         // Passing the dependency by reference ensures that you're working with the same instance of the object throughout the lifetime of the object.
             // destructor not needed in this case b/c this class does not "own" the dependency; aka it was instantiated elsewhere
                 // how to remove from stack if instantiated in global scope ??
@@ -159,17 +162,33 @@ public:
     {
             angRange = maxAng - minAng + 1;
             middleAng = setMidAng();
-                servo.attach(servoPin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
-                servo.write(middleAng);
+            servo.attach(servoPin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+            servo.write(middleAng);
             prevAng = middleAng;
     }
 
-    // static std::optional<Rabbit> create(Servo& aServo, bool feetTowardsHighAng, uint8_t lowAng = 10, uint8_t highAng = 170) {
-    //     if(lowAng is <= 0 || highAng >= 180 || highAng < lowAng) {
+public:
+    // static std::optional<Rabbit> create(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) {
+    //     if(lowAng <= 0 || highAng >= 180 || highAng < lowAng) {
     //         return std::nullopt;
     //     }
             // print values !!
     // }
+    // static std::unique_ptr<Rabbit> create(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) {
+    //     if(lowAng <= 0 || highAng >= 180 || highAng < lowAng) {
+    //         return nullptr;
+    //     }
+    //         // print values !!
+    //     return std::make_unique<Rabbit>(feetTowardsHighAng, aServo, lowAng = 10, highAng = 170);
+    // }
+    static std::unique_ptr<Rabbit> create(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) {
+        // adjust types !!
+        if(lowAng <= 0 || highAng >= 180 || highAng < lowAng) {
+            return nullptr;
+        }
+            // print values !!
+        return std::unique_ptr<Rabbit>(new Rabbit(feetTowardsHighAng, aServo, lowAng = 10, highAng = 170));
+    }
 
     // alive; used while continuity through mag connector (or other method of continuity)
     void struggle() {
@@ -184,7 +203,7 @@ public:
 
     // dead; used while NO continuity through mag connector (or other method of continuity); ends at middleAng
     void headless() {
-        if(!decapped) {  
+        if(!decapped) {
             delay(50);
             // imagery = should curl up before loosening
             newAng = feetAtMaxAng ? maxAng - angRange / 10 : minAng + angRange / 10;
@@ -237,7 +256,7 @@ public:
     uint8_t getMinAng() {
         return minAng;
     }
-    
+
     uint8_t getMiddleAng() {
         return middleAng;
     }
@@ -259,7 +278,7 @@ public:
     //     Serial.println("---");
     //     Serial.print("Servo position in microseconds: ");
     //     Serial.println(microsec);
-    //     Serial.print("Servo position in angle: ");
+    //     Serial.print("Servo position in degrees: ");
     //     Serial.println(ang);
     //     delay(2000);
     // }
@@ -277,7 +296,7 @@ public:
     //     Serial.println("---");
     //     Serial.print("Servo position in microseconds: ");
     //     Serial.println(microsec);
-    //     Serial.print("Servo position in angle: ");
+    //     Serial.print("Servo position in degrees: ");
     //     Serial.println(ang);
     //     delay(2000);
     // }
