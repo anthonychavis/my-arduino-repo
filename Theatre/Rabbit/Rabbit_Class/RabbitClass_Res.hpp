@@ -150,13 +150,20 @@ class Rabbit {
         prevAng = newAng;
     }
 
-        // Passing the dependency by reference ensures that you're working with the same instance of the object throughout the lifetime of the object.
-            // destructor not needed in this case b/c this class does not "own" the dependency; aka it was instantiated elsewhere
-                // how to remove from stack if instantiated in global scope ??
-    // use "explicit" to prevent implicit conversions
+    // for troubleshooting
+    void printAllAngs() {
+        Serial.print("minAng: ");Serial.println(minAng);
+        Serial.print("maxAng: ");Serial.println(maxAng);
+        Serial.print("angRange: ");Serial.println(angRange);
+        Serial.print("middleAng: ");Serial.println(middleAng);
+        Serial.print("prevAng: ");Serial.println(prevAng);
+        if(newAng) {
+            Serial.print("newAng: ");Serial.println(newAng);
+        }
+    }
 
     // Test higher lowAng & lower highAng first to check how much the gears amplify the angles !!
-    // negative values may result in unexpected behavior - for now
+    // negative values may result in unexpected behavior - for now !!
     explicit Rabbit(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) :
         feetAtMaxAng(feetTowardsHighAng), servo(aServo), minAng(lowAng), maxAng(highAng)
     {
@@ -168,30 +175,27 @@ class Rabbit {
     }
 
 public:
-    // static std::optional<Rabbit> create(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) {
-    //     if(lowAng <= 0 || highAng >= 180 || highAng < lowAng) {
-    //         return std::nullopt;
-    //     }
-            // print values !!
-    // }
-    // static std::unique_ptr<Rabbit> create(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) {
-    //     if(lowAng <= 0 || highAng >= 180 || highAng < lowAng) {
-    //         return nullptr;
-    //     }
-    //         // print values !!
-    //     return std::make_unique<Rabbit>(feetTowardsHighAng, aServo, lowAng = 10, highAng = 170);
-    // }
+    ~Rabbit() {
+        servo.detach();
+        Serial.println("Servo detachment initiated - destructor()");
+    }
+
     static std::unique_ptr<Rabbit> create(bool feetTowardsHighAng, Servo& aServo, uint8_t lowAng = 10, uint8_t highAng = 170) {
+        auto rabbit = std::unique_ptr<Rabbit>(new Rabbit(feetTowardsHighAng, aServo, lowAng, highAng));
         // adjust types !!
-        if(lowAng <= 0 || highAng >= 180 || highAng < lowAng) {
+        if(lowAng < 0 || highAng > 180 || highAng < lowAng) {
+            Serial.println("CANNOT create this rabbit - create()");
+            rabbit->printAllAngs();
             return nullptr;
         }
-            // print values !!
-        return std::unique_ptr<Rabbit>(new Rabbit(feetTowardsHighAng, aServo, lowAng = 10, highAng = 170));
+        Serial.println("The rabbit is born! - create()");
+        rabbit->printAllAngs();
+        return rabbit;
     }
 
     // alive; used while continuity through mag connector (or other method of continuity)
     void struggle() {
+        Serial.println("struggle() execution");
         if(survivability != initSurvivability) {
             easterBunny();
         }
@@ -203,6 +207,7 @@ public:
 
     // dead; used while NO continuity through mag connector (or other method of continuity); ends at middleAng
     void headless() {
+        Serial.println("headless() execution");
         if(!decapped) {
             delay(50);
             // imagery = should curl up before loosening
@@ -249,24 +254,9 @@ public:
         return survivability;
     }
 
-    void servoDetach() {
-        servo.detach();
-    }
-
-    uint8_t getMinAng() {
-        return minAng;
-    }
-
-    uint8_t getMiddleAng() {
-        return middleAng;
-    }
-
-    uint8_t getMaxAng() {
-        return maxAng;
-    }
-
-    uint8_t getAngRange() {
-        return angRange;
+    // fix how it repeats the values from 1st execution w/in loop() !!
+    void getAllAngs() {
+        printAllAngs();
     }
 
     // FOR TESTING

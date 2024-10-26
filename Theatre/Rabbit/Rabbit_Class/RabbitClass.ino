@@ -15,10 +15,6 @@ NOTE:
 #include "RabbitClass_Res.hpp"
 // #include "Rabbit_Res.hpp"
 
-        // pass by reference ?? Passing the dependency by reference ensures that you're working with the same instance of the object throughout the lifetime of th object. ??
-        // should these be instantiated here ??
-            // how are they removed from the stack if here ??
-
 /*
 - test servo min/max pulse width before running Rabbit
 - set TestingMyServo to true when testing Servo; false otherwise
@@ -35,14 +31,15 @@ param2: Servo object;
 param3: mimimum angle in range;
 param4: maximum angle in range;
 */
-auto fluffyCute = Rabbit::create(true, myServo, 0, 180);
-// Rabbit fluffyCute(true, myServo, 0, 180);
+// auto fluffyCute = Rabbit::create(true, myServo, 0, 180);
+std::unique_ptr<Rabbit> fluffyCute;
 
 //// put your setup code here, to run once:
 void setup() {
     // testing
     Serial.begin(9600);
     delay(1000);
+
 
     #ifdef issa_CPx
         // for quick functioning test
@@ -54,6 +51,18 @@ void setup() {
 
     // for mag connector/continuity
     pinMode(contPin, INPUT_PULLUP);  // uses onboard resistor;
+
+    if(!TestingMyServo){
+        fluffyCute = Rabbit::create(true, myServo, 0, 180);
+        if(fluffyCute) {
+            Serial.println("The rabbit is born! - setup()");
+        } else {
+            Serial.println("fluffyCute doesn't exist");
+        }
+    }  else {
+        myServo.attach(servoPin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+        Serial.println("TestingMyServo; servoPin attachment initiated.");
+    }
 
     delay(1000);
 }
@@ -79,8 +88,8 @@ void loop() {
         return;
     }
 
-    // if(!fluffyCute.servoAttached()) {
-    if(!fluffyCute->servoAttached()) {
+    if(!fluffyCute) {
+        Serial.println("The soul of the creature you seek cannot be detected.");
         delay(500);
         return;
     }
@@ -88,13 +97,10 @@ void loop() {
     curMillis = millis();
     if(curMillis - timer > delayMS) {
         discontinuous = digitalRead(contPin);  // HIGH & True == 1;
-        // !discontinuous ? fluffyCute.struggle() : fluffyCute.headless();
         !discontinuous ? fluffyCute->struggle() : fluffyCute->headless();
     }
 
-    // if(!fluffyCute.revivable()) {
     if(!fluffyCute->revivable()) {
-        // fluffyCute.servoDetach();
-        fluffyCute->servoDetach();
+        fluffyCute = nullptr;
     }
 }
