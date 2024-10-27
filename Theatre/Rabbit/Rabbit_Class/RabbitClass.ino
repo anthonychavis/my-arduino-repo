@@ -24,14 +24,7 @@ NOTE:
 // Servo object instantiated from a Servo library
 Servo myServo;
 
-/*
-(explicit constructor call);
-param1: rabbit feet are towards the higher angles?;
-param2: Servo object;
-param3: mimimum angle in range;
-param4: maximum angle in range;
-*/
-// auto fluffyCute = Rabbit::create(true, myServo, 0, 180);
+
 std::unique_ptr<Rabbit> fluffyCute;
 
 //// put your setup code here, to run once:
@@ -52,7 +45,13 @@ void setup() {
     // for mag connector/continuity
     pinMode(contPin, INPUT_PULLUP);  // uses onboard resistor;
 
-    if(!TestingMyServo){
+    if(!TestingMyServo) {
+        /*
+        param1: rabbit feet are towards the higher angles?;
+        param2: Servo object;
+        param3: mimimum angle in range;
+        param4: maximum angle in range;
+        */
         fluffyCute = Rabbit::create(true, myServo, 0, 180);
         if(fluffyCute) {
             Serial.println("The rabbit is born! - setup()");
@@ -70,7 +69,7 @@ void setup() {
 //// put your main code here, to run repeatedly:
 void loop() {
     #ifdef issa_CPx
-        // (quick functioning test)
+        // quick functioning test
         digitalWrite(boardLedPin, digitalRead(ledBtnPin));
         // for board-controlled switch (not between power & board)
         switchOn = digitalRead(switchPin);
@@ -90,12 +89,12 @@ void loop() {
 
     if(!fluffyCute) {
         Serial.println("The soul of the creature you seek cannot be detected.");
-        delay(500);
+        delay(1000);
         return;
     }
 
     curMillis = millis();
-    if(curMillis - timer > delayMS) {
+    if(curMillis >= delayMS) {
         discontinuous = digitalRead(contPin);  // HIGH & True == 1;
         !discontinuous ? fluffyCute->struggle() : fluffyCute->headless();
     }

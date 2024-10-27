@@ -66,8 +66,7 @@ for servo
 #define MAX_PULSE_WIDTH 2120
 
 // time
-unsigned long curMillis, timer = 0;
-uint16_t delayMS;
+unsigned long curMillis, delayMS;
 
 // for mag connector
 bool discontinuous;
@@ -118,7 +117,7 @@ class Rabbit {
     const double vel = 60.0 / 250;  // degrees/millisecs
 
     // dead
-    const uint16_t initSurvivability = 100;  // min = 0; max = 65536
+    const uint16_t initSurvivability = 10;  // min = 0; max = 65536
     uint16_t survivability = initSurvivability;
     bool decapped = false, feetAtMaxAng;
     const float initAccel = 1.1;
@@ -136,10 +135,10 @@ class Rabbit {
         return angDiff >= 0 ? angDiff : abs(angDiff);  // don't calc w/in abs()
     }
 
-    // set new timer val & write new angle
-    void newAngTimer() {
+    // set new delayMS val & write new angle
+    void newAngDelay() {
         servo.write(newAng);
-        timer = curMillis;
+        delayMS += curMillis;
     }
 
     // reset if accidental death
@@ -202,7 +201,7 @@ public:
         newAng = random(minAng, maxAng);
         delayMS = angDiffFunc() / vel + 1;
         prevAng = newAng;
-        newAngTimer();
+        newAngDelay();
     }
 
     // dead; used while NO continuity through mag connector (or other method of continuity); ends at middleAng
@@ -219,8 +218,9 @@ public:
         } else if(newAng == middleAng) {
             // this block extends the accidental death allowance - see initSurvivability
             survivability--;
-            delayMS = 300;
-            timer = curMillis;
+            delayMS = 300 + curMillis;
+            Serial.println(delayMS);
+            Serial.println(survivability);
             return;
         } else {
             if(accel < middleAng) {
@@ -240,7 +240,7 @@ public:
                 Serial.println(newAng);
                 Serial.println(accel);
         }
-        newAngTimer();
+        newAngDelay();
     }
 
     // GETTERS
