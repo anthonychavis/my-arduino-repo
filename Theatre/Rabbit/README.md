@@ -59,5 +59,3 @@ there were still plenty rewards obtained."</p>
 ## Footnotes
 
 [^1]: The fin & shark reference a joke that came about during show prep.
-
-[ToC](#toc)
