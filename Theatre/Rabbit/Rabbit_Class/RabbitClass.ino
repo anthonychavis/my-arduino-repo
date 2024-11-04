@@ -1,7 +1,7 @@
 /*
 NOTE:
     - Must find the servo's min/max pulse width (microseconds)
-    - CPx refers to pins of the Circuit Playground Express - confirmed works w/9g servo
+    - CPx refers to the Circuit Playground Express - confirmed works w/9g servo
     - QT refers to the QT PY Pico
     - might have to change pin value for other boards
 */
@@ -45,7 +45,6 @@ for servo
     #define contPin 1  // A7 == D1 - CPx;
 
     // use within the setup() function
-    // inline
     void cpxSetup() {
         // for quick functioning test
         pinMode(boardLedPin, OUTPUT);  // for board-controlled LED
@@ -55,7 +54,6 @@ for servo
     }
 
     // use within the loop() function
-    // inline
     void cpxLoop() {
         // quick functioning test
         digitalWrite(boardLedPin, digitalRead(ledBtnPin));
@@ -93,8 +91,7 @@ void printServoPos(Servo servoObj) {
 // don't use while main program is active; serial print servoObj position in microseconds at specified angle
 void printServoPos(Servo servoObj, int angle) {
     if(angle > 180 || angle < 0) {
-        Serial.print("adhere to 0 <= angle <= 180; you entered: ");
-        Serial.println(angle);
+        Serial.print("adhere to 0 <= angle <= 180; you entered: "); Serial.println(angle);
         delay(2000);
         return;
     }
@@ -145,13 +142,12 @@ void loop() {
 #include "RabbitClass_Res.hpp"
 // #include "Rabbit_Res.hpp"
 
-// for mag connector
+// for mag connector/continuity
 bool discontinuous;
 
 // time
 TimeStruct fluffyTime;
 
-// std::unique_ptr<Rabbit> fluffyCute;
 std::unique_ptr<Rabbit> fluffyCute = nullptr;
 
 void setup() {
@@ -166,7 +162,7 @@ void setup() {
     // for mag connector/continuity
     pinMode(contPin, INPUT_PULLUP);  // uses onboard resistor;
 
-        /*
+    /*
     param1: rabbit feet are towards the higher angles?;
     param2: Servo object;
     param3: TimeStruct var;
@@ -174,6 +170,8 @@ void setup() {
     param5: maximum angle in range;
     */
     fluffyCute = Rabbit::create(true, myServo, fluffyTime, 0, 180);
+    // fluffyCute = Rabbit::create(true, myServo, fluffyTime, 150, 180);  // for testing
+    // fluffyCute = Rabbit::create(true, myServo, fluffyTime, 0, 30);  // for testing
 
     if(fluffyCute) {
         Serial.println("The rabbit is born! - setup()");

@@ -1,11 +1,10 @@
 #ifndef RABBIT_RES_H
-
 #define RABBIT_RES_H
 
 /*
 NOTE:
     - Must find the servo's min/max pulse width (microseconds)
-    - CPx refers to pins of the Circuit Playground Express
+    - CPx refers to the Circuit Playground Express
     - QT refers to the QT PY Pico
     - might have to change pin value for other boards
 */
@@ -58,6 +57,8 @@ class Rabbit {
     uint16_t survivability = initSurvivability;
     bool decapped = false, feetAtMaxAng;
     const float initAccel = 1.1;
+    // const float initAccel = 1.01;  // for testing
+    // const float initAccel = 1.001;  // for testing
     float accel = initAccel;
 
     // METHODS
@@ -93,20 +94,32 @@ class Rabbit {
         decapped = true;
     }
 
+    // could further improve for maxAng, minAng, & initAccel variance !!
     // for headless()
     void decapAccelNewAng() {
-        if(accel < middleAng) {
-            if(middleAng < newAng && feetAtMaxAng) {
-                newAng -= accel;
-            } else if(middleAng > newAng && !feetAtMaxAng) {
-                newAng += accel;
-            } else {
-                newAng = middleAng;
-            }
-            if(newAng != middleAng) accel *= accel;
-        } else {
+        if(accel > middleAng) {
             newAng = middleAng;
+            return;
         }
+
+        if(feetAtMaxAng) {
+            newAng -= accel;
+            if(middleAng > newAng) {
+                newAng = middleAng;
+                return;
+            }
+        } else {
+            newAng += accel + 1;
+            if( middleAng < newAng) {
+                newAng = middleAng;
+                return;
+            }
+        }
+
+        accel *= accel;
+
+        // Serial.print("accel increased to ");Serial.println(accel);  // for testing
+        // Serial.print("newAng: ");Serial.println(newAng);  // for testing
     }
 
     // for headless()
@@ -124,13 +137,12 @@ class Rabbit {
         Serial.print("angRange: ");Serial.println(angRange);
         Serial.print("middleAng: ");Serial.println(middleAng);
         Serial.print("prevAng: ");Serial.println(prevAng);
-        if(newAng) {
+        if(newAng) {  // change types & assign -1 !!
             Serial.print("newAng: ");Serial.println(newAng);
         }
     }
 
-    // Test higher lowAng & lower highAng first to check how much the gears amplify the angles !!
-    // negative values may result in unexpected behavior - for now !!
+    // negative values result in unexpected behavior - for now !!
     explicit Rabbit(const bool feetTowardsHighAng, Servo& aServo, TimeStruct& timeData, const uint8_t lowAng = 10, const uint8_t highAng = 170) :
         feetAtMaxAng(feetTowardsHighAng), servo(aServo), rabTime(timeData), minAng(lowAng), maxAng(highAng)
     {
@@ -172,11 +184,11 @@ public:
         newAngDelay();
     }
 
-    // dead; used while NO continuity through mag connector (or other method of continuity); ends at middleAng
+    // dead; used while NO continuity through mag connector (or other method of continuity); position ends at middleAng
     void headless() {
+            // imagery = [should curl up]; a final movement (as if signal from brain already sent to muscles) w/dramatic pause before loosening
         if(!decapped) {
             delay(50);
-            // imagery = [should curl up]; a final movement (as if signal from parietal already sent to muscles) w/dramatic pause before loosening
             initDecap();
         } else if(newAng == middleAng) {
             decreaseSurvivability();
