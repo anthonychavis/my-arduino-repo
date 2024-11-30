@@ -89,8 +89,8 @@ This program was developed for a prop in an October play.
 
 ### Prerequisites
 
-- [Arduino IDE](#https://www.arduino.cc/en/software)
-    - [Set Up for Circuit Playground Express](#https://learn.adafruit.com/adafruit-circuit-playground-express/set-up-arduino-ide)
+- [Arduino IDE](https://www.arduino.cc/en/software)
+    - [Set Up for Circuit Playground Express](https://learn.adafruit.com/adafruit-circuit-playground-express/set-up-arduino-ide)
 
  ### Steps
 
