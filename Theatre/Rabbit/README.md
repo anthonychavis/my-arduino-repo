@@ -100,14 +100,14 @@ This program was developed for a prop in an October play.
     - open the command line to the directory that will hold the clone & clone the repo; for example:
         - `git clone https://github.com/anthonychavis/my-arduino-repo.git`
 - open the Arduino IDE -> File -> Open:
-    - go to `../my-arduino-repo/Theatre/Rabbit`
+    - go to `./my-arduino-repo/Theatre/Rabbit`
     - delete the `.ino` file there
-    - go to `../Rabbit_Class`
+    - go to `./Rabbit_Class`
     - select to open the `RabbitClass.ino` file
         - there will be a prompt to create a directory of the same name as this file
             - _a lesson learned for me_
         - the `.ino` file will move into that directory
-        - move the `.hpp` file from `../Rabbit_Class` into the new directory
+        - move the `.hpp` file from `./Rabbit_Class` into the new directory
 - select the correct board & port
 - recommend first "_verifying_" before "_uploading_"
     - click the _checkmark_ icon to test compilation
