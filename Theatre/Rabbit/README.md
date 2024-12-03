@@ -6,7 +6,7 @@ A rabbit, held with its spine vertical, struggles to free itself from an actor's
 
 ## Table of Contents
 
-- [Code](https://github.com/anthonychavis/my-arduino-repo/tree/main/Theatre/Rabbit/Rabbit_Class) (_link leaves this README page_)
+- [Code][Rabbit_Class] (_link leaves this README page_)
 - [Description](#description)
     - [Challenges](#challenges)
     - [Solutions](#solutions)
@@ -19,7 +19,7 @@ A rabbit, held with its spine vertical, struggles to free itself from an actor's
 
 ## Description
 
-This program was developed for a prop in an October play. 
+This program was developed for a prop in an October play.
 
 ### Challenges
 
@@ -30,16 +30,16 @@ This program was developed for a prop in an October play.
 ### Solutions
 
 1. Created a `Rabbit` class
-    - a public `struggle()` method for when it is "alive"
+    - a public [`struggle()`][struggle] method for when it is "alive"
         - while continuity through a wire is sensed by the microcontroller
-    - a public `headless()` method for when it is "decapitated"
+    - a public [`headless()`][headless] method for when it is "decapitated"
         - when continuity is no longer sensed
 2. Within `headless()` is a conditional that handles the behavior immediately after decapitation is sensed along with some dramatization I added in
-    - private `initDecap()` method
+    - private [`initDecap()`][initDecap] method
         - one last struggle movement
         - a brief pause (_slightly extra time delay_)
         - change `decap` state to `true`
-    - private `decapAccelNewAng()` method
+    - private [`decapAccelNewAng()`][decapAccelNewAng] method
         - starts moving slowly at first; then accelerates to the middle position
 
 ### Tech
@@ -49,7 +49,7 @@ This program was developed for a prop in an October play.
     - _IDE 2.3.3_
 - Circuit Playground Express
     - _& other boards_
-- Servo
+- Servo motor
     - _9g_
     - _180 deg_
 
@@ -59,26 +59,27 @@ This program was developed for a prop in an October play.
     1. I included a _guard_ for accidental death (_disconnection/reconnection of the wire used for continuity_)
         - there is some time allowed for the rabbit to go back to its alive-movements if continuity is sensed again
         - see `Rabbit` class:
-            - private `decreaseSurvivability()` method
+            - private [`decreaseSurvivability()`][decreaseSurvivability] method
                 - invoked within `headless()`
-            - private `survivability` field assigned the value of the private `initSurvivability` field
+            - private [`survivability`][survivability] field assigned the value of the private [`initSurvivability`][initSurvivability] field
                 - decremented within `decreaseSurvivability()`
-                - returned by getter `revivable()`
-                    - used as a conditional within `loop()` in the `.ino` file
-            - private `easterBunny()` method
+                - returned by getter [`revivable()`][revivable]
+                    - used as a conditional within [`loop()`][loop] in the `.ino` file
+            - private [`easterBunny()`][easterBunny] method
                 - invoked within `struggle()`
     2. just in case the servo orientation had to be one way as opposed to the other when inserted into the rabbit model, I added code to easily allow it
-        - see the `Rabbit` constructor argument `feetTowardsHighAng`
-- to help protect the servo:
-    1. since not all servos are aligned to the same pulse widths (_microseconds_), I also included code to test for the servo's pulse width
-        - the program is automatically set with macros in the `.ino` file to test this first
-            - see `TestingMyServo`
-        - the values to help test this are set by adjusting those assigned to `lowestPulseWidth` & `highestPulseWidth`
-    2. a static `create()` method is used to run checks before allowing the instantiation of a `Rabbit` object
-        - I also didn't want the creation of an object with unsuitable conditions or state
+        - see the [`Rabbit` constructor][Rabbit-constructor] argument `feetTowardsHighAng`
+    3. to help protect the servo:
+        - since not all servos are aligned to the same pulse widths (_microseconds_), I also included code to test for the servo's pulse width
+            - the program is automatically set with macros in the `.ino` file to test this first
+                - see [`TestingMyServo`][TestingMyServo]
+            - the values to help test this are set by adjusting those assigned to [`lowestPulseWidth`][lowestPulseWidth] & [`highestPulseWidth`][highestPulseWidth]
+        - a static [`create()`][create] method is used to run checks before allowing the instantiation of a `Rabbit` object
+            - I also didn't want the creation of an object with unsuitable conditions or state
 - lastly, since I utilized features of the Circuit Playground Express during building & iterating on the program while unsure of what microcontroller would be used during the play, I include macros to compile some code only if the Circuit Playground Express is used
-    - see `issa_CPx` in the `.ino` file
+    - see [`issa_CPx`][issa_CPx] in the `.ino` file
     - most microcontrollers do not include the specific features that this code utilizes
+        - _pinned onboard switch, button, & LED_
 <!-- mention the edge-case bug here ?? -->
 
 [Table of Contents](#table-of-contents)
@@ -89,10 +90,10 @@ This program was developed for a prop in an October play.
 
 ### Prerequisites
 
-- [Arduino IDE](https://www.arduino.cc/en/software) (_to external website_)
-    - [Set Up for Circuit Playground Express](https://learn.adafruit.com/adafruit-circuit-playground-express/set-up-arduino-ide) (_to external website_)
+- [Arduino IDE](https://www.arduino.cc/en/software) (_external link_)
+    - [Set Up for Circuit Playground Express](https://learn.adafruit.com/adafruit-circuit-playground-express/set-up-arduino-ide) (_external link_)
 
- ### Steps
+### Steps
 
 #### Git Clone
 
@@ -106,8 +107,8 @@ This program was developed for a prop in an October play.
     - select to open the `RabbitClass.ino` file
         - there will be a prompt to create a directory of the same name as this file
             - _a lesson learned for me_
-        - the `.ino` file will move into that directory
-        - move the `.hpp` file from `./Rabbit_Class` into the new directory
+        - the `.ino` file will move into that new directory
+- move the `.hpp` file from `./Rabbit_Class` into the new directory
 - select the correct board & port
 - recommend first "_verifying_" before "_uploading_"
     - click the _checkmark_ icon to test compilation
@@ -128,10 +129,30 @@ This program was developed for a prop in an October play.
 
 ## Acknowledgements
 
-- this program is currently built to work with either the `Servo.h` or `ESP32Servo.h` servo library
+- this program is currently built to work with either the [`Servo.h`][Servoh] (_external link_) or [`ESP32Servo.h`][ESP32Servoh] (_external link_) servo library
 
 [Table of Contents](#table-of-contents)
 
 ## Footnotes
 
 [^1]: The fin & shark reference a joke that came about during show prep.
+
+[Rabbit_Class]: https://github.com/anthonychavis/my-arduino-repo/tree/main/Theatre/Rabbit/Rabbit_Class
+[struggle]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L196
+[headless]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L180
+[initDecap]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L112
+[decapAccelNewAng]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L72
+[decreaseSurvivability]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L96
+[survivability]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L57
+[initSurvivability]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L56
+[revivable]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L217
+[loop]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L185
+[easterBunny]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L104
+[Rabbit-constructor]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L140
+[TestingMyServo]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L74
+[lowestPulseWidth]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L31
+[highestPulseWidth]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L32
+[create]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L156
+[issa_CPx]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L16
+[Servoh]: https://docs.arduino.cc/libraries/servo/
+[ESP32Servoh]: https://docs.arduino.cc/libraries/esp32servo/
