@@ -132,7 +132,7 @@ Within the Arduino IDE:
     - a _Serial Monitor_ tab will open next to the _Output_ tab
     - all programmed output messages will appear here
 - After successfully uploading the program onto the microcontroller:
-    - either unplug the USB cable from the board/computer or press the _reset_ button on the board
+    - either unplug the USB cable from the board/computer & plug it back in, or press the _reset_ button on the board
         - the messages from `setup()` will appear
 - While the program is running & connected to the IDE:
     - there is nothing printed to the _Serial Monitor_ while `!discontinuous`, or when `struggle()` can be invoked
