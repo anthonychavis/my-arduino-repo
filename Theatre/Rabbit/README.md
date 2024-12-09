@@ -13,6 +13,7 @@ A rabbit, held with its spine vertical, struggles to free itself from an actor's
     - [Tech](#tech)
     - [Extra features](#extra-features)
 - [Installation](#installation)
+- [Usage](#usage)
 <!-- - [Project Visuals](#project-visuals) -->
 - [Acknowledgements](#acknowledgements)
 - [Footnotes](#footnotes)
@@ -75,7 +76,7 @@ This program was developed for a prop in an October play.
                 - see [`TestingMyServo`][TestingMyServo]
             - the values to help test this are set by adjusting those assigned to [`lowestPulseWidth`][lowestPulseWidth] & [`highestPulseWidth`][highestPulseWidth]
         - a static [`create()`][create] method is used to run checks before allowing the instantiation of a `Rabbit` object
-            - I also didn't want the creation of an object with unsuitable conditions or state
+            - _I didn't want the creation of an object with unsuitable conditions or state_
 - lastly, since I utilized features of the Circuit Playground Express during building & iterating on the program while unsure of what microcontroller would be used during the play, I include macros to compile some code only if the Circuit Playground Express is used
     - see [`issa_CPx`][issa_CPx] in the `.ino` file
     - most microcontrollers do not include the specific features that this code utilizes
@@ -97,23 +98,48 @@ This program was developed for a prop in an October play.
 
 #### Git Clone
 
-- if you decide to clone this entire repo:
-    - open the command line to the directory that will hold the clone & clone the repo; for example:
-        - `git clone https://github.com/anthonychavis/my-arduino-repo.git`
-- open the Arduino IDE -> File -> Open:
+If you decide to clone this entire repo:
+1. open the command line to the directory that will hold the clone & clone the repo; for example:
+    - `git clone https://github.com/anthonychavis/my-arduino-repo.git`
+2. open the Arduino IDE -> _File_ -> _Open_:
     - go to `./my-arduino-repo/Theatre/Rabbit`
+        - _found within the directory where the repo was cloned_
     - delete the `.ino` file there
     - go to `./Rabbit_Class`
     - select to open the `RabbitClass.ino` file
         - there will be a prompt to create a directory of the same name as this file
             - _a lesson learned for me_
         - the `.ino` file will move into that new directory
-- move the `.hpp` file from `./Rabbit_Class` into the new directory
-- select the correct board & port
-- recommend first "_verifying_" before "_uploading_"
+3. move the `.hpp` file from `./Rabbit_Class` into the new directory
+
+#### Compile & Upload
+
+Within the Arduino IDE:
+1. select the correct board & port
+2. recommend first "_verifying_" before "_uploading_"
     - click the _checkmark_ icon to test compilation
     - pay attention to the output
-- if compilation is successful, click the _upload_ icon
+        - _an output console pane will appear in the IDE_
+3. if compilation is successful, click the _upload_ icon
+
+[Table of Contents](#table-of-contents)
+
+## Usage
+
+### Serial Monitor
+
+- To view the _print_ messages, go to _Tools_ -> _Serial Monitor_
+    - a _Serial Monitor_ tab will open next to the _Output_ tab
+    - all programmed output messages will appear here
+- After successfully uploading the program onto the microcontroller:
+    - either unplug the USB cable from the board/computer or press the _reset_ button on the board
+        - the messages from `setup()` will appear
+- While the program is running & connected to the IDE:
+    - there is nothing printed to the _Serial Monitor_ while `!discontinuous`, or when `struggle()` can be invoked
+    - make sure the **baud rate** in the IDE's Serial Monitor is set to 9600 <!-- add img for clarity -->
+        - if the baud rate has to change for a specific board, it should match the value set in [`Serial.begin()`][serial-begin_docs] (_external link_) within the `setup()` function
+            - [`Serial.begin()`][serial-begin_testing] when testing the servo
+            - [`Serial.begin()`][serial-begin_not-testing] when not testing the servo
 
 [Table of Contents](#table-of-contents)
 
@@ -137,22 +163,33 @@ This program was developed for a prop in an October play.
 
 [^1]: The fin & shark reference a joke that came about during show prep.
 
-[Rabbit_Class]: https://github.com/anthonychavis/my-arduino-repo/tree/main/Theatre/Rabbit/Rabbit_Class
-[struggle]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L196
-[headless]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L180
-[initDecap]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L112
-[decapAccelNewAng]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L72
-[decreaseSurvivability]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L96
-[survivability]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L57
-[initSurvivability]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L56
-[revivable]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L217
-[loop]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L185
-[easterBunny]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L104
-[Rabbit-constructor]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L140
-[TestingMyServo]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L74
-[lowestPulseWidth]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L31
-[highestPulseWidth]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L32
-[create]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L156
-[issa_CPx]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L16
-[Servoh]: https://docs.arduino.cc/libraries/servo/
-[ESP32Servoh]: https://docs.arduino.cc/libraries/esp32servo/
+
+<!-- TOC -->
+[Rabbit_Class]: https://github.com/anthonychavis/my-arduino-repo/tree/main/Theatre/Rabbit/Rabbit_Class "to the Rabbit_Class directory"
+
+<!-- Description -->
+[struggle]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L196 "to the struggle() definition"
+[headless]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L180 "to the headless() definition"
+[initDecap]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L112 "to the initDecap() definition"
+[decapAccelNewAng]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L72 "to the decapAccelNewAng() definition"
+[decreaseSurvivability]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L96 "to the decreaseSurvivability() definition"
+[survivability]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L57 "to the survivability assignment"
+[initSurvivability]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L56 "to the initSurvivability assignment"
+[revivable]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L217 "to the revivable() definition"
+[loop]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L185 "to the loop() function - when !(TestingMyServo)"
+[easterBunny]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L104 "to the easterBunny() definition"
+[Rabbit-constructor]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L140 "to the Rabbit constructor"
+[TestingMyServo]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L74 "to the TestingMyServo assignment"
+[lowestPulseWidth]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L31 "to the lowestPulseWidth assignment"
+[highestPulseWidth]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L32 "to the highestPulseWidth assignment"
+[create]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass_Res.hpp#L156 "to the create() definition"
+[issa_CPx]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L16 "to the issa_CPx declaration"
+
+<!-- Usage -->
+[serial-begin_docs]: https://docs.arduino.cc/language-reference/en/functions/communication/serial/begin/ "external link to the Serial.begin() documentation"
+[serial-begin_testing]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L109 "to the Serial.begin() when TestingMyServo"
+[serial-begin_not-testing]: https://github.com/anthonychavis/my-arduino-repo/blob/main/Theatre/Rabbit/Rabbit_Class/RabbitClass.ino#L155 "to the Serial.begin() when !TestingMyServo"
+
+<!-- Acknowledgements -->
+[Servoh]: https://docs.arduino.cc/libraries/servo/ "external link to the Arduino Servo.h documentation"
+[ESP32Servoh]: https://docs.arduino.cc/libraries/esp32servo/ "external link to the Arduino ESP32Servo.h documentation"
