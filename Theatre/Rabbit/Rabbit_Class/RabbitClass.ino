@@ -1,9 +1,10 @@
 /*
 NOTE:
-    - Must find the servo's min/max pulse width (microseconds)
-    - CPx refers to the Circuit Playground Express - confirmed works w/9g servo
+    - Must find the servo's min/max pulse width (microseconds) - see code below
+    - CPX refers to the Circuit Playground Express - reconfirmed works with a 180 degree 9g servo
     - QT refers to the QT PY Pico
     - might have to change pin value for other boards
+    - currently built for boards that support the C++ memory library
 */
 
 #if defined(ARDUINO_ARCH_ESP32)
@@ -12,8 +13,13 @@ NOTE:
 #include <Servo.h>
 #endif
 
-#if defined(__SAMD21G18A__)
-#define issa_CPx
+#if defined(ARDUINO_SAMD_CIRCUITPLAYGROUND_EXPRESS)  // core
+#include "Issa_CPX.hpp"  // defaults: servoPin 10; contPin 1
+#else
+// for servo
+#define servoPin 1  // change as needed; A0 == D26 - QT (unless using wifi); pwm/~
+// for mag connector/continuity
+#define contPin 10  // change as needed; A3 == D15 - QT  (unless using wifi); digital input
 #endif
 
 /*
@@ -22,51 +28,8 @@ for servo
 - could start with the values given in the servo spec sheet
 - default was 540 & 2400 for Servo.h
 */
-#ifdef lowestPulseWidth
-#undef lowestPulseWidth
-#endif
-#ifdef highestPulseWidth
-#undef highestPulseWidth
-#endif
-#define lowestPulseWidth 532
-#define highestPulseWidth 2120
-
-
-#ifdef issa_CPx
-    // board-controlled LED for quick functionin test
-    #define ledBtnPin 4  // btn A - CPx
-    #define boardLedPin 13  // D13 - CPx
-    // board controlled switch (not between power & board)
-    bool switchOn;
-    #define switchPin 7  // D7 - CPx
-    // for servo
-    #define servoPin 10  // A3 == D10 - CPx
-    // for mag connector/continuity
-    #define contPin 1  // A7 == D1 - CPx;
-
-    // use within the setup() function
-    void cpxSetup() {
-        // for quick functioning test
-        pinMode(boardLedPin, OUTPUT);  // for board-controlled LED
-        pinMode(ledBtnPin, INPUT_PULLDOWN);  // makes default status of the D4 btn = 0 (as opposed to truthy)
-        // board controlled switch (not between power & board)
-        pinMode(switchPin, INPUT_PULLUP);  // resistor needed for CPx onboard switch
-    }
-
-    // use within the loop() function
-    void cpxLoop() {
-        // quick functioning test
-        digitalWrite(boardLedPin, digitalRead(ledBtnPin));
-        // for board-controlled switch (not between power & board)
-        switchOn = digitalRead(switchPin);
-    }
-#else
-    // for servo
-    #define servoPin 1  // change as needed; A0 == D26 - QT (unless using wifi); pwm/~
-    // for mag connector/continuity
-    #define contPin 10  // change as needed; A3 == D15 - QT  (unless using wifi); digital input
-#endif
-
+#define lowestPulseWidth 600
+#define highestPulseWidth 2100
 /*
 - test servo min/max pulse width before running Rabbit
 - set TestingMyServo to true when testing Servo; false otherwise
@@ -77,50 +40,28 @@ for servo
 Servo myServo;
 
 
-//// TESTING SERVO 
+//// TESTING SERVO
 #if TestingMyServo
-// serial print servoObj position in microseconds
-void printServoPos(Servo servoObj) {
-    int microsec = servoObj.readMicroseconds();
-    int ang = servoObj.read();
-    Serial.println("---");
-    Serial.print("Servo position in microseconds: "); Serial.println(microsec);
-    Serial.print("Servo position in degrees: "); Serial.println(ang);
-    delay(2000);
-};
-// don't use while main program is active; serial print servoObj position in microseconds at specified angle
-void printServoPos(Servo servoObj, int angle) {
-    if(angle > 180 || angle < 0) {
-        Serial.print("adhere to 0 <= angle <= 180; you entered: "); Serial.println(angle);
-        delay(2000);
-        return;
-    }
-    servoObj.write(angle);
-    int microsec = servoObj.readMicroseconds();
-    int ang = servoObj.read();
-    Serial.println("---");
-    Serial.print("Servo position in microseconds: "); Serial.println(microsec);
-    Serial.print("Servo position in degrees: "); Serial.println(ang);
-    delay(2000);
-};
+#include "TestingServo.hpp"
 
+//// setup code here, to run once
 void setup() {
     // testing
     Serial.begin(9600);
     delay(1000);
 
-    #ifdef issa_CPx
+    #ifdef ISSA_CPX
         cpxSetup();
     #endif
 
     myServo.attach(servoPin, lowestPulseWidth, highestPulseWidth);
     Serial.println("TestingMyServo; servoPin attachment initiated.");
-
     delay(1000);
 }
 
+//// main code here, to run repeatedly
 void loop() {
-    #ifdef issa_CPx
+    #ifdef ISSA_CPX
         cpxLoop();
         if(!switchOn) {
             delay(1000);
@@ -137,25 +78,25 @@ void loop() {
 //// end TESTING SERVO
 
 
-//// NOT TESTING SERVO 
+//// NOT TESTING SERVO
 #if !(TestingMyServo)
+#include "TimeStruct.hpp"
 #include "RabbitClass_Res.hpp"
-// #include "Rabbit_Res.hpp"
 
 // for mag connector/continuity
-bool discontinuous;
+bool discontinuous = false;
 
-// time
 TimeStruct fluffyTime;
 
 std::unique_ptr<Rabbit> fluffyCute = nullptr;
 
+//// setup code here, to run once
 void setup() {
     // testing
     Serial.begin(9600);
     delay(1000);
 
-    #ifdef issa_CPx
+    #ifdef ISSA_CPX
         cpxSetup();
     #endif
 
@@ -170,20 +111,18 @@ void setup() {
     param5: maximum angle in range;
     */
     fluffyCute = Rabbit::create(true, myServo, fluffyTime, 0, 180);
-    // fluffyCute = Rabbit::create(true, myServo, fluffyTime, 150, 180);  // for testing
-    // fluffyCute = Rabbit::create(true, myServo, fluffyTime, 0, 30);  // for testing
 
     if(fluffyCute) {
         Serial.println("The rabbit is born! - setup()");
     } else {
         Serial.println("fluffyCute doesn't exist");
     }
-
     delay(1000);
 }
 
+//// main code here, to run repeatedly
 void loop() {
-    #ifdef issa_CPx
+    #ifdef ISSA_CPX
         cpxLoop();
         if(!switchOn) {
             delay(1000);
