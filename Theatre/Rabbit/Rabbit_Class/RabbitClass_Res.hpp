@@ -4,45 +4,9 @@
 /*
 NOTE:
     - Must find the servo's min/max pulse width (microseconds)
-    - CPx refers to the Circuit Playground Express - confirmed still works
-    - QT refers to the QT PY Pico
-    - might have to change pin value for other boards
 */
 
-#include <memory>
-
-//// VARS
-
-#ifndef servoPin
-#define servoPin
-#endif
-
-#ifndef contPin
-#define contPin
-#endif
-
-#ifndef lowestPulseWidth
-#define lowestPulseWidth
-#endif
-
-#ifndef highestPulseWidth
-#define highestPulseWidth
-#endif
-
-// time
-struct TimeStruct {
-    unsigned long curMillis = 0;
-    unsigned long delayMS = 0;
-};
-
-// // servo angle range limits
-// struct AngRangeLims {
-//     uint8_t minAng = 0;
-//     uint8_t maxAng = 180;
-// };
-
-
-//// CLASSES 
+#include <memory>  // not all boards support the C++ memory library;
 
 class Rabbit {
     Servo& servo;
@@ -53,18 +17,17 @@ class Rabbit {
     const double vel = 60.0 / 250;  // degrees/millisecs
 
     // dead
-    const uint16_t initSurvivability = 10;  // min = 0; max = 65536
+    const uint16_t initSurvivability = 10;  // value range = [0, 65536)
     uint16_t survivability = initSurvivability;
     bool decapped = false, feetAtMaxAng;
-    const float initAccel = 1.1;
-    float accel = initAccel;
+    const double initAccel = 1.1;
+    double accel = initAccel;
 
     // METHODS
 
     // return angle difference
     uint8_t angDiffFunc() {
-        int16_t angDiff = newAng - prevAng;
-        return angDiff >= 0 ? angDiff : abs(angDiff);  // don't calc w/in abs()
+        return newAng > prevAng ? newAng - prevAng : prevAng - newAng;
     }
 
     // could further improve for maxAng, minAng, & initAccel variance !!
@@ -82,7 +45,7 @@ class Rabbit {
                 return;
             }
         } else {
-            newAng += accel + 1;
+            newAng += accel + 1;  // look into cast to !!
             if(middleAng < newAng) {
                 newAng = middleAng;
                 return;
@@ -92,9 +55,8 @@ class Rabbit {
         accel *= accel;
     }
 
-    // for headless()
+    // for headless(); extends the accidental death allowance - see initSurvivability
     void decreaseSurvivability() {
-        // extends the accidental death allowance - see initSurvivability
         survivability--;
         rabTime.delayMS = 300 + rabTime.curMillis;
         Serial.print("survivability level: ");Serial.println(survivability);
@@ -110,8 +72,8 @@ class Rabbit {
 
     // for headless()
     void initDecap() {
-        newAng = feetAtMaxAng ? maxAng - angRange / 10 : minAng + angRange / 10;
-        rabTime.delayMS = angDiffFunc() / vel + 251;
+        newAng = feetAtMaxAng ? maxAng - angRange / 10 : minAng + angRange / 10;  // truncated
+        rabTime.delayMS = angDiffFunc() / vel + 251;  // widened to unsigned long
         decapped = true;
     }
 
@@ -123,6 +85,7 @@ class Rabbit {
 
     // for troubleshooting
     void printAllAngs() {
+        Serial.println("---");
         Serial.print("minAng: ");Serial.println(minAng);
         Serial.print("maxAng: ");Serial.println(maxAng);
         Serial.print("angRange: ");Serial.println(angRange);
@@ -137,14 +100,24 @@ class Rabbit {
         return angRange >> 1 + minAng;  // truncated
     }  // might need a neutralAng depending on how it fxns w/model
 
-    explicit Rabbit(const bool feetTowardsHighAng, Servo& aServo, TimeStruct& timeData, const uint8_t lowAng = 10, const uint8_t highAng = 170) :
-        feetAtMaxAng(feetTowardsHighAng), servo(aServo), rabTime(timeData), minAng(lowAng), maxAng(highAng)
+    explicit Rabbit(
+        const bool feetTowardsHighAng,
+        Servo& aServo,
+        TimeStruct& timeData,
+        const uint8_t lowAng = 10,
+        const uint8_t highAng = 170
+    ) :
+        feetAtMaxAng(feetTowardsHighAng),
+        servo(aServo),
+        rabTime(timeData),
+        minAng(lowAng),
+        maxAng(highAng)
     {
-            angRange = maxAng - minAng + 1;
-            middleAng = setMidAng();
-            servo.attach(servoPin, lowestPulseWidth, highestPulseWidth);
-            servo.write(middleAng);
-            prevAng = middleAng;
+        angRange = maxAng - minAng + 1;
+        middleAng = setMidAng();
+        servo.attach(servoPin, lowestPulseWidth, highestPulseWidth);
+        servo.write(middleAng);
+        prevAng = middleAng;
     }
 
 public:
@@ -153,20 +126,27 @@ public:
         Serial.println("Servo detachment initiated");
     }
 
-    static std::unique_ptr<Rabbit> create(const bool feetTowardsHighAng, Servo& aServo, TimeStruct& timeData, const int16_t lowAng = 10, const int16_t highAng = 170) {
+    static std::unique_ptr<Rabbit> create(
+        const bool feetTowardsHighAng,
+        Servo& aServo,
+        TimeStruct& timeData,
+        const int16_t lowAng = 10,
+        const int16_t highAng = 170
+    )
+    {
         // improve conditional to check spacing !!
         if(lowAng < 0 || highAng > 180 || highAng < lowAng) {
             Serial.println("CANNOT create this rabbit - create()");
             Serial.println("check lowAng & highAng; adhere to 0 <= lowAng < highAng <= 180");
             return nullptr;
         }
-        
-        auto rabbit = std::unique_ptr<Rabbit>(new Rabbit(feetTowardsHighAng, aServo, timeData, lowAng, highAng));
+
+        auto rabbit = std::unique_ptr<Rabbit>(new Rabbit(feetTowardsHighAng, aServo, timeData, lowAng, highAng));  // cast to !!
 
         // in case i move things around too quickly again
         if(rabbit->middleAng < 0) {
             Serial.println("CANNOT create this rabbit - create()");
-            Serial.println("Check that the angRange is initiated prior to the initiation of middleAng.");
+            Serial.println("In the constructor, check that the angRange is reassigned prior to reassigning middleAng.");
             rabbit->printAllAngs();
             return nullptr;
         }
@@ -177,19 +157,22 @@ public:
     }
 
     // dead; used while NO continuity through mag connector (or other method of continuity); position ends at middleAng
+    // imagery = [should curl up -- (certain cases not handled)]; a final movement (as if signal from brain already sent to muscles) w/dramatic pause before loosening
     void headless() {
-        // imagery = [should curl up]; a final movement (as if signal from brain already sent to muscles) w/dramatic pause before loosening
+        // prevAng = newAng;  // not needed unless want to print; 
         if(!decapped) {
             delay(50);
             initDecap();
         } else if(newAng == middleAng) {
             decreaseSurvivability();
+            // printAllAngs();
             return;
         } else {
             decapAccelNewAng();
             rabTime.delayMS = 65;
         }
         newAngDelay();
+        // printAllAngs();
     }
 
     // alive; used while continuity through mag connector (or other method of continuity)
@@ -198,7 +181,8 @@ public:
             easterBunny();
         }
         newAng = random(minAng, maxAng);
-        rabTime.delayMS = angDiffFunc() / vel + 1;
+        rabTime.delayMS = angDiffFunc() / vel + 1;  // widened to unsigned long
+        // printAllAngs();
         prevAng = newAng;
         newAngDelay();
     }
@@ -206,13 +190,13 @@ public:
     // GETTERS
 
     // fix how it repeats the values from 1st execution w/in loop() !!
-    void getAllAngs() {
-        printAllAngs();
-    }
+    // void getAllAngs() {
+    //     printAllAngs();
+    // }
 
-    int16_t getMiddleAng() {
-        return middleAng;
-    }
+    // int16_t getMiddleAng() {
+    //     return middleAng;
+    // }
 
     uint16_t revivable() {
         // need to add check in case type is changed again !!
